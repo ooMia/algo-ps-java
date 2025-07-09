@@ -7,7 +7,7 @@ class MainTest {
     void checkMainDependencies() {
         assertNotNull(Main.br);
         assertNotNull(Main.bw);
-        assertNotNull(Main.parser);
-        assertNotNull(Main.runner);
+        assertNotNull(Main.supplier);
+        assertNotNull(Main.consumer);
     }
 }

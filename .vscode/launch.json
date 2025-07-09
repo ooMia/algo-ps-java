@@ -9,9 +9,6 @@
       "projectName": "app",
       "console": "integratedTerminal",
       "args": [
-        "./gradlew",
-        ":app:run",
-        "--console=plain",
         "<",
         "app/src/main/resources/input.txt",
         ">",

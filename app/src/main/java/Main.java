@@ -4,139 +4,199 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
+import java.util.EmptyStackException;
+import java.util.List;
+import java.util.Queue;
+import java.util.Stack;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-interface IParser {
+interface ISupplier extends IStructModifier, IStructState {
     QInput next();
 
     boolean hasNext();
 }
 
-interface IRunner {
-    void run() throws IOException;
+interface IConsumer {
+    void consume(QInput input) throws IOException;
 }
 
 public class Main {
     static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static final IParser parser = new Parser(br);
-    static final IRunner runner = new Runner(parser, bw);
+    static final ISupplier supplier = new Supplier(br);
+    static final IConsumer consumer = new Consumer(bw, supplier);
 
     public static void main(String[] args) {
         try {
-            runner.run();
-            bw.flush();
-            bw.close();
-            br.close();
-        } catch (IOException e) {
-            System.err.println(e);
+            while (supplier.hasNext()) {
+                QInput input = supplier.next();
+                consumer.consume(input);
+            }
+
+            if (supplier.isSuccess()) {
+                bw.write("Nice\n");
+            } else {
+                bw.write("Sad\n");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bw.flush();
+                bw.close();
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
 
-class Parser implements IParser {
-    final BufferedReader reader;
-    final QInput cache = new QInput(0, null);
-    boolean hasNextLine = true;
+// ====== Problem Domain ======
 
-    public Parser(BufferedReader br) {
+interface IStructModifier {
+    void sourceToTemp();
+
+    void sourceToDest();
+
+    void tempToDest();
+}
+
+interface IStructState {
+    boolean isSuccess();
+
+    boolean isValidId(Integer id);
+}
+
+class Supplier implements ISupplier {
+    final BufferedReader reader;
+    final QInput _cache = new QInput();
+
+    private final int goalId;
+    private int needId;
+
+    final Queue<Integer> source;
+    final Stack<Integer> temp;
+
+    public Supplier(BufferedReader br) {
         this.reader = br;
         try {
-            reader.readLine(); // Skip the first line
-        } catch (IOException e) {
+            int nPeople = Integer.parseInt(reader.readLine());
+            this.goalId = nPeople;
+            this.needId = 1;
+
+            List<Integer> ids = Stream.of(reader.readLine().split(" "))
+                    .mapToInt(Integer::parseInt)
+                    .boxed()
+                    .collect(Collectors.toList());
+            this.source = new ArrayDeque<>(ids);
+            this.temp = new Stack<>();
+
+            this._cache.set(source.peek(), null);
+        } catch (Exception e) {
             throw new IllegalArgumentException();
         }
     }
 
     @Override
     public QInput next() {
-        String[] parts;
-        try {
-            String line = reader.readLine();
-            parts = line.split(" ");
-        } catch (IOException | NullPointerException e) {
-            hasNextLine = false;
-            return null;
-        }
-        int a = Integer.parseInt(parts[0]);
-        Integer b = parts.length > 1 ? Integer.parseInt(parts[1]) : null;
-        cache.set(a, b);
-        return cache;
+        _cache.set(source.peek(), temp.isEmpty() ? null : temp.peek());
+        return _cache;
     }
 
     @Override
     public boolean hasNext() {
-        return hasNextLine;
+        boolean hasSource = !source.isEmpty();
+        boolean hasTemp = !temp.isEmpty();
+        boolean hasTempAlive = !hasSource && hasTemp && temp.peek() == needId;
+        return hasSource || hasTempAlive;
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return !hasNext() && needId > goalId;
+    }
+
+    @Override
+    public boolean isValidId(Integer id) {
+        return id != null && id == needId;
+    }
+
+    @Override
+    public void sourceToTemp() {
+        Integer id = source.poll();
+        if (id == null) {
+            return;
+        }
+        temp.push(id);
+        System.err.println("source -> temp: " + id);
+    }
+
+    @Override
+    public void sourceToDest() {
+        Integer id = source.poll();
+        if (id == null) {
+            return;
+        }
+        System.err.println("source -> dest: " + id);
+        needId++;
+    }
+
+    @Override
+    public void tempToDest() {
+        try {
+            Integer id = temp.pop();
+            if (id == null) {
+                return;
+            }
+            System.err.println("temp -> dest: " + id);
+            needId++;
+        } catch (EmptyStackException e) {
+        }
     }
 }
 
 // record pattern
 class QInput {
-    private int opCode;
-    private Integer operand;
+    private Integer sourceId;
+    private Integer tempId;
 
-    public QInput(int opCode, Integer operand) {
-        this.opCode = opCode;
-        this.operand = operand;
+    public void set(Integer sourceId, Integer tempId) {
+        this.sourceId = sourceId;
+        this.tempId = tempId;
     }
 
-    public int opCode() {
-        return opCode;
+    public Integer sourceId() {
+        return sourceId;
     }
 
-    public Integer operand() {
-        return operand;
-    }
-
-    public void set(int opCode, Integer operand) {
-        this.opCode = opCode;
-        this.operand = operand;
+    public Integer tempId() {
+        return tempId;
     }
 }
 
-class Runner implements IRunner {
-    final IParser parser;
+class Consumer implements IConsumer {
     final BufferedWriter writer;
-    final ArrayDeque<Integer> stack = new ArrayDeque<>(); // Java Stack is synchronized, which can be inefficient.
+    final ISupplier supplier;
 
-    public Runner(IParser parser, BufferedWriter bw) {
-        this.parser = parser;
+    public Consumer(BufferedWriter bw, ISupplier supplier) {
         this.writer = bw;
-    }
-
-    void iterate() throws IOException {
-        QInput input = parser.next();
-        if (input == null)
-            return;
-
-        switch (input.opCode()) {
-            case 1:
-                stack.push(input.operand());
-                break;
-            case 2:
-                writer.write(String.valueOf(stack.isEmpty() ? -1 : stack.pop()));
-                writer.newLine();
-                break;
-            case 3:
-                writer.write(String.valueOf(stack.size()));
-                writer.newLine();
-                break;
-            case 4:
-                writer.write(String.valueOf(stack.isEmpty() ? 1 : 0));
-                writer.newLine();
-                break;
-            case 5:
-                writer.write(String.valueOf(stack.isEmpty() ? -1 : stack.peek()));
-                writer.newLine();
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
+        this.supplier = supplier;
     }
 
     @Override
-    public void run() throws IOException {
-        while (parser.hasNext()) {
-            iterate();
+    public void consume(QInput input) throws IOException {
+        if (supplier.isValidId(input.sourceId())) {
+            supplier.sourceToDest();
+            return;
         }
+
+        if (supplier.isValidId(input.tempId())) {
+            supplier.tempToDest();
+            return;
+        }
+
+        supplier.sourceToTemp();
     }
 }
