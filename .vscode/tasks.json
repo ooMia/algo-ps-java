@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "check-output-diff",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "export TERM=xterm-256color; diff --color=always -w app/src/main/resources/output.txt app/src/main/resources/expected.txt && echo \"$(tput setaf 2)Success$(tput sgr0)\" || echo \"$(tput setaf 1)Failed$(tput sgr0)\""
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "reevaluateOnRerun": true
+      }
+    }
+  ]
+}

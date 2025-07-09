@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run Main (interactive)",
+      "request": "launch",
+      "mainClass": "Main",
+      "projectName": "app",
+      "console": "integratedTerminal",
+      "args": [
+        "./gradlew",
+        ":app:run",
+        "--console=plain",
+        "<",
+        "app/src/main/resources/input.txt",
+        ">",
+        "app/src/main/resources/output.txt"
+      ],
+      "postDebugTask": "check-output-diff"
+    }
+  ]
+}
