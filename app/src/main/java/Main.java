@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 interface ISupplier extends IStructModifier, IStructState {
@@ -20,6 +23,28 @@ interface IConsumer {
 }
 
 public class Main {
+    /**
+     * 1번부터 N번까지 N개의 풍선이 원형으로 놓여 있다.
+     * i번 풍선의 오른쪽에는 i+1번 풍선이 있고, 왼쪽에는 i-1번 풍선이 있다.
+     * 단, 1번 풍선의 왼쪽에 N번 풍선이 있고, N번 풍선의 오른쪽에 1번 풍선이 있다.
+     * 
+     * 각 풍선 안에는 종이가 하나 들어있고, 종이에는 -N보다 크거나 같고, N보다 작거나 같은 정수가 하나 적혀있다.
+     * 
+     * 이 풍선들을 다음과 같은 규칙으로 터뜨린다.
+     * 우선, 제일 처음에는 1번 풍선을 터뜨린다.
+     * 다음에는 풍선 안에 있는 종이를 꺼내어 그 종이에 적혀있는 값만큼 이동하여 다음 풍선을 터뜨린다.
+     * 양수가 적혀 있을 경우에는 오른쪽으로, 음수가 적혀 있을 때는 왼쪽으로 이동한다.
+     * 이동할 때에는 이미 터진 풍선은 빼고 이동한다.
+     * 
+     * 예를 들어 다섯 개의 풍선 안에 차례로 3, 2, 1, -3, -1이 적혀 있었다고 하자.
+     * 이 경우 3이 적혀 있는 1번 풍선, -3이 적혀 있는 4번 풍선, -1이 적혀 있는 5번 풍선, 1이 적혀 있는 3번 풍선, 2가 적혀
+     * 있는 2번 풍선의 순서대로 터지게 된다.
+     * 
+     * 첫째 줄에 자연수 N(1 ≤ N ≤ 1,000)이 주어진다. 다음 줄에는 차례로 각 풍선 안의 종이에 적혀 있는 수가 주어진다. 종이에
+     * 0은 적혀있지 않다.
+     * 
+     * 첫째 줄에 터진 풍선의 번호를 차례로 나열한다.
+     */
     static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
     static final ISupplier supplier = new Supplier(br);
@@ -48,35 +73,29 @@ public class Main {
 // ====== Problem Domain ======
 
 interface IStructModifier {
-    void C1_pushFront(int x); // 정수 X를 덱의 앞에 넣는다. (1 ≤ X ≤ 100,000)
-
-    void C2_pushBack(int x); // 정수 X를 덱의 뒤에 넣는다. (1 ≤ X ≤ 100,000)
-
-    int C3_popFront(); // 덱에 정수가 있다면 맨 앞의 정수를 빼고 출력한다. 없다면 -1을 대신 출력한다.
-
-    int C4_popBack(); // 덱에 정수가 있다면 맨 뒤의 정수를 빼고 출력한다. 없다면 -1을 대신 출력한다.
 }
 
 interface IStructState {
-    int C5_size(); // 덱에 들어있는 정수의 개수를 출력한다
-
-    int C6_isEmpty(); // 덱이 비어있으면 1, 아니면 0을 출력한다.
-
-    int C7_peekFront(); // 덱에 정수가 있다면 맨 앞의 정수를 출력한다. 없다면 -1을 대신 출력한다.
-
-    int C8_peekBack(); // 덱에 정수가 있다면 맨 뒤의 정수를 출력한다. 없다면 -1을 대신 출력한다.
 }
 
 class Supplier implements ISupplier {
     final BufferedReader reader;
-    final QInput _cache = new QInput();
 
-    final Deque<Integer> deque = new ArrayDeque<>();
+    final Deque<QInput> deque = new ArrayDeque<>();
 
     public Supplier(BufferedReader br) {
         this.reader = br;
         try {
             reader.readLine(); // 첫 줄은 무시
+            List<Integer> parts = Arrays.stream(reader.readLine().split(" "))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+
+            for (int i = 0; i < parts.size(); i++) {
+                QInput input = new QInput();
+                input.set(i + 1, parts.get(i));
+                deque.add(input);
+            }
         } catch (Exception e) {
             throw new IllegalArgumentException();
         }
@@ -84,77 +103,45 @@ class Supplier implements ISupplier {
 
     @Override
     public QInput next() {
-        int[] parts;
-        try {
-            parts = Stream.of(reader.readLine().split(" "))
-                    .mapToInt(Integer::parseInt)
-                    .toArray();
-            _cache.set(parts[0], parts.length > 1 ? parts[1] : null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        System.err.println(
+                Stream.of(deque.toArray()).map(o -> "(" + ((QInput) o).id + ")").collect(Collectors.joining(" ")));
+        var res = deque.poll();
+        if (deque.isEmpty()) {
+            return res;
         }
-        return _cache;
+
+        int move = res.value;
+        if (move > 0) {
+            move -= 1;
+        }
+        move %= deque.size();
+        while (move != 0) {
+            if (move > 0) {
+                deque.addLast(deque.pollFirst());
+                move--;
+            } else {
+                deque.addFirst(deque.pollLast());
+                move++;
+            }
+        }
+        return res;
     }
 
     @Override
     public boolean hasNext() {
-        try {
-            return reader.ready();
-        } catch (IOException e) {
-            return false;
-        }
+        return !deque.isEmpty();
     }
 
-    @Override
-    public void C1_pushFront(int x) {
-        deque.addFirst(x);
-    }
-
-    @Override
-    public void C2_pushBack(int x) {
-        deque.addLast(x);
-    }
-
-    @Override
-    public int C3_popFront() {
-        return deque.isEmpty() ? -1 : deque.removeFirst();
-    }
-
-    @Override
-    public int C4_popBack() {
-        return deque.isEmpty() ? -1 : deque.removeLast();
-    }
-
-    @Override
-    public int C5_size() {
-        return deque.size();
-    }
-
-    @Override
-    public int C6_isEmpty() {
-        return deque.isEmpty() ? 1 : 0;
-    }
-
-    @Override
-    public int C7_peekFront() {
-        return deque.isEmpty() ? -1 : deque.peekFirst();
-    }
-
-    @Override
-    public int C8_peekBack() {
-        return deque.isEmpty() ? -1 : deque.peekLast();
-    }
 }
 
 // record pattern
 class QInput {
-    int operator;
-    Integer operand;
+    int id; // 풍선의 번호
+    int value; // 풍선 안에 적힌 값
 
-    public void set(int operator, Integer operand) {
-        this.operator = operator;
-        this.operand = operand;
+    public void set(int id, int value) {
+        this.id = id;
+        this.value = value;
     }
 }
 
@@ -170,32 +157,7 @@ class Consumer implements IConsumer {
 
     @Override
     public void consume(QInput input) throws IOException {
-        switch (input.operator) {
-            case 1:
-                supplier.C1_pushFront(input.operand);
-                break;
-            case 2:
-                supplier.C2_pushBack(input.operand);
-                break;
-            case 3:
-                sb.append(supplier.C3_popFront()).append('\n');
-                break;
-            case 4:
-                sb.append(supplier.C4_popBack()).append('\n');
-                break;
-            case 5:
-                sb.append(supplier.C5_size()).append('\n');
-                break;
-            case 6:
-                sb.append(supplier.C6_isEmpty()).append('\n');
-                break;
-            case 7:
-                sb.append(supplier.C7_peekFront()).append('\n');
-                break;
-            case 8:
-                sb.append(supplier.C8_peekBack()).append('\n');
-                break;
-        }
+        sb.append(input.id).append(" ");
     }
 
     @Override
