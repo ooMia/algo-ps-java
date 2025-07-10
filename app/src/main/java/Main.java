@@ -3,48 +3,22 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 interface ISupplier extends IStructModifier, IStructState {
     QInput next();
-
     boolean hasNext();
 }
 
 interface IConsumer {
     void consume(QInput input) throws IOException;
-
     void flush() throws IOException;
 }
 
 public class Main {
-    /**
-     * 1번부터 N번까지 N개의 풍선이 원형으로 놓여 있다.
-     * i번 풍선의 오른쪽에는 i+1번 풍선이 있고, 왼쪽에는 i-1번 풍선이 있다.
-     * 단, 1번 풍선의 왼쪽에 N번 풍선이 있고, N번 풍선의 오른쪽에 1번 풍선이 있다.
-     * 
-     * 각 풍선 안에는 종이가 하나 들어있고, 종이에는 -N보다 크거나 같고, N보다 작거나 같은 정수가 하나 적혀있다.
-     * 
-     * 이 풍선들을 다음과 같은 규칙으로 터뜨린다.
-     * 우선, 제일 처음에는 1번 풍선을 터뜨린다.
-     * 다음에는 풍선 안에 있는 종이를 꺼내어 그 종이에 적혀있는 값만큼 이동하여 다음 풍선을 터뜨린다.
-     * 양수가 적혀 있을 경우에는 오른쪽으로, 음수가 적혀 있을 때는 왼쪽으로 이동한다.
-     * 이동할 때에는 이미 터진 풍선은 빼고 이동한다.
-     * 
-     * 예를 들어 다섯 개의 풍선 안에 차례로 3, 2, 1, -3, -1이 적혀 있었다고 하자.
-     * 이 경우 3이 적혀 있는 1번 풍선, -3이 적혀 있는 4번 풍선, -1이 적혀 있는 5번 풍선, 1이 적혀 있는 3번 풍선, 2가 적혀
-     * 있는 2번 풍선의 순서대로 터지게 된다.
-     * 
-     * 첫째 줄에 자연수 N(1 ≤ N ≤ 1,000)이 주어진다. 다음 줄에는 차례로 각 풍선 안의 종이에 적혀 있는 수가 주어진다. 종이에
-     * 0은 적혀있지 않다.
-     * 
-     * 첫째 줄에 터진 풍선의 번호를 차례로 나열한다.
-     */
     static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
     static final ISupplier supplier = new Supplier(br);
@@ -70,8 +44,6 @@ public class Main {
     }
 }
 
-// ====== Problem Domain ======
-
 interface IStructModifier {
 }
 
@@ -80,21 +52,21 @@ interface IStructState {
 
 class Supplier implements ISupplier {
     final BufferedReader reader;
-
-    final Deque<QInput> deque = new ArrayDeque<>();
+    final List<QInput> balloons = new ArrayList<>();
+    int currentIndex = 0;
 
     public Supplier(BufferedReader br) {
         this.reader = br;
         try {
             reader.readLine(); // 첫 줄은 무시
-            List<Integer> parts = Arrays.stream(reader.readLine().split(" "))
+            List<Integer> values = Arrays.stream(reader.readLine().split(" "))
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
 
-            for (int i = 0; i < parts.size(); i++) {
-                QInput input = new QInput();
-                input.set(i + 1, parts.get(i));
-                deque.add(input);
+            for (int i = 0; i < values.size(); i++) {
+                QInput balloon = new QInput();
+                balloon.set(i + 1, values.get(i));
+                balloons.add(balloon);
             }
         } catch (Exception e) {
             throw new IllegalArgumentException();
@@ -103,45 +75,51 @@ class Supplier implements ISupplier {
 
     @Override
     public QInput next() {
-        System.err.println(
-                Stream.of(deque.toArray()).map(o -> "(" + ((QInput) o).id + ")").collect(Collectors.joining(" ")));
-        var res = deque.poll();
-        if (deque.isEmpty()) {
-            return res;
+        if (balloons.isEmpty()) {
+            return null;
         }
-
-        int move = res.value;
-        if (move > 0) {
-            move -= 1;
+        
+        QInput currentBalloon = balloons.get(currentIndex);
+        int moveCount = currentBalloon.value;
+        
+        // 현재 풍선을 제거
+        balloons.remove(currentIndex);
+        
+        // 모든 풍선을 터뜨렸으면 반환
+        if (balloons.isEmpty()) {
+            return currentBalloon;
         }
-        move %= deque.size();
-        while (move != 0) {
-            if (move > 0) {
-                deque.addLast(deque.pollFirst());
-                move--;
-            } else {
-                deque.addFirst(deque.pollLast());
-                move++;
+        
+        // 다음 풍선 위치 계산
+        if (moveCount > 0) {
+            // 양수: 오른쪽으로 이동
+            currentIndex = (currentIndex + moveCount - 1) % balloons.size();
+        } else {
+            // 음수: 왼쪽으로 이동
+            currentIndex = (currentIndex + moveCount) % balloons.size();
+            if (currentIndex < 0) {
+                currentIndex += balloons.size();
             }
         }
-        return res;
+        
+        return currentBalloon;
     }
 
     @Override
     public boolean hasNext() {
-        return !deque.isEmpty();
+        return !balloons.isEmpty();
     }
-
 }
 
-// record pattern
 class QInput {
-    int id; // 풍선의 번호
-    int value; // 풍선 안에 적힌 값
+    int id;
+    int value;
+    boolean used;
 
     public void set(int id, int value) {
         this.id = id;
         this.value = value;
+        this.used = false;
     }
 }
 
