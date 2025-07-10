@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Queue;
-import java.util.Stack;
-import java.util.stream.Collectors;
+import java.util.Deque;
 import java.util.stream.Stream;
 
 interface ISupplier extends IStructModifier, IStructState {
@@ -18,6 +15,8 @@ interface ISupplier extends IStructModifier, IStructState {
 
 interface IConsumer {
     void consume(QInput input) throws IOException;
+
+    void flush() throws IOException;
 }
 
 public class Main {
@@ -32,17 +31,11 @@ public class Main {
                 QInput input = supplier.next();
                 consumer.consume(input);
             }
-
-            if (supplier.isSuccess()) {
-                bw.write("Nice\n");
-            } else {
-                bw.write("Sad\n");
-            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                bw.flush();
+                consumer.flush();
                 bw.close();
                 br.close();
             } catch (IOException e) {
@@ -55,41 +48,35 @@ public class Main {
 // ====== Problem Domain ======
 
 interface IStructModifier {
-    void sourceToTemp();
+    void C1_pushFront(int x); // 정수 X를 덱의 앞에 넣는다. (1 ≤ X ≤ 100,000)
 
-    void sourceToDest();
+    void C2_pushBack(int x); // 정수 X를 덱의 뒤에 넣는다. (1 ≤ X ≤ 100,000)
 
-    void tempToDest();
+    int C3_popFront(); // 덱에 정수가 있다면 맨 앞의 정수를 빼고 출력한다. 없다면 -1을 대신 출력한다.
+
+    int C4_popBack(); // 덱에 정수가 있다면 맨 뒤의 정수를 빼고 출력한다. 없다면 -1을 대신 출력한다.
 }
 
 interface IStructState {
-    boolean isSuccess();
+    int C5_size(); // 덱에 들어있는 정수의 개수를 출력한다
 
-    boolean isValidId(Integer id);
+    int C6_isEmpty(); // 덱이 비어있으면 1, 아니면 0을 출력한다.
+
+    int C7_peekFront(); // 덱에 정수가 있다면 맨 앞의 정수를 출력한다. 없다면 -1을 대신 출력한다.
+
+    int C8_peekBack(); // 덱에 정수가 있다면 맨 뒤의 정수를 출력한다. 없다면 -1을 대신 출력한다.
 }
 
 class Supplier implements ISupplier {
     final BufferedReader reader;
     final QInput _cache = new QInput();
 
-    private int needId = 1;
-
-    final Queue<Integer> source;
-    final Stack<Integer> temp;
+    final Deque<Integer> deque = new ArrayDeque<>();
 
     public Supplier(BufferedReader br) {
         this.reader = br;
         try {
             reader.readLine(); // 첫 줄은 무시
-
-            List<Integer> ids = Stream.of(reader.readLine().split(" "))
-                    .mapToInt(Integer::parseInt)
-                    .boxed()
-                    .collect(Collectors.toList());
-            this.source = new ArrayDeque<>(ids);
-            this.temp = new Stack<>();
-
-            this._cache.set(source.peek(), null);
         } catch (Exception e) {
             throw new IllegalArgumentException();
         }
@@ -97,77 +84,84 @@ class Supplier implements ISupplier {
 
     @Override
     public QInput next() {
-        _cache.set(source.peek(), temp.isEmpty() ? null : temp.peek());
+        int[] parts;
+        try {
+            parts = Stream.of(reader.readLine().split(" "))
+                    .mapToInt(Integer::parseInt)
+                    .toArray();
+            _cache.set(parts[0], parts.length > 1 ? parts[1] : null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
         return _cache;
     }
 
     @Override
     public boolean hasNext() {
-        // 소스에 데이터가 있으면 계속 처리
-        if (!source.isEmpty()) {
-            return true;
+        try {
+            return reader.ready();
+        } catch (IOException e) {
+            return false;
         }
-
-        // 소스가 비어있어도 temp에서 처리할 수 있는 데이터가 있으면 계속
-        return !temp.isEmpty() && temp.peek() == needId;
     }
 
     @Override
-    public boolean isSuccess() {
-        return source.isEmpty() && temp.isEmpty();
+    public void C1_pushFront(int x) {
+        deque.addFirst(x);
     }
 
     @Override
-    public boolean isValidId(Integer id) {
-        return id != null && id == needId;
+    public void C2_pushBack(int x) {
+        deque.addLast(x);
     }
 
     @Override
-    public void sourceToTemp() {
-        Integer id = source.poll();
-        if (id == null) {
-            return;
-        }
-        temp.push(id);
-        System.err.println("source -> temp: " + id);
+    public int C3_popFront() {
+        return deque.isEmpty() ? -1 : deque.removeFirst();
     }
 
     @Override
-    public void sourceToDest() {
-        Integer id = source.poll();
-        if (id == null) {
-            return;
-        }
-        System.err.println("source -> dest: " + id);
-        needId++;
+    public int C4_popBack() {
+        return deque.isEmpty() ? -1 : deque.removeLast();
     }
 
     @Override
-    public void tempToDest() {
-        if (temp.isEmpty()) {
-            return;
-        }
+    public int C5_size() {
+        return deque.size();
+    }
 
-        Integer id = temp.pop();
-        System.err.println("temp -> dest: " + id);
-        needId++;
+    @Override
+    public int C6_isEmpty() {
+        return deque.isEmpty() ? 1 : 0;
+    }
+
+    @Override
+    public int C7_peekFront() {
+        return deque.isEmpty() ? -1 : deque.peekFirst();
+    }
+
+    @Override
+    public int C8_peekBack() {
+        return deque.isEmpty() ? -1 : deque.peekLast();
     }
 }
 
 // record pattern
 class QInput {
-    Integer sourceId;
-    Integer tempId;
+    int operator;
+    Integer operand;
 
-    public void set(Integer sourceId, Integer tempId) {
-        this.sourceId = sourceId;
-        this.tempId = tempId;
+    public void set(int operator, Integer operand) {
+        this.operator = operator;
+        this.operand = operand;
     }
 }
 
 class Consumer implements IConsumer {
     final BufferedWriter writer;
     final ISupplier supplier;
+    final StringBuilder sb = new StringBuilder();
 
     public Consumer(BufferedWriter bw, ISupplier supplier) {
         this.writer = bw;
@@ -176,16 +170,37 @@ class Consumer implements IConsumer {
 
     @Override
     public void consume(QInput input) throws IOException {
-        if (supplier.isValidId(input.sourceId)) {
-            supplier.sourceToDest();
-            return;
+        switch (input.operator) {
+            case 1:
+                supplier.C1_pushFront(input.operand);
+                break;
+            case 2:
+                supplier.C2_pushBack(input.operand);
+                break;
+            case 3:
+                sb.append(supplier.C3_popFront()).append('\n');
+                break;
+            case 4:
+                sb.append(supplier.C4_popBack()).append('\n');
+                break;
+            case 5:
+                sb.append(supplier.C5_size()).append('\n');
+                break;
+            case 6:
+                sb.append(supplier.C6_isEmpty()).append('\n');
+                break;
+            case 7:
+                sb.append(supplier.C7_peekFront()).append('\n');
+                break;
+            case 8:
+                sb.append(supplier.C8_peekBack()).append('\n');
+                break;
         }
+    }
 
-        if (supplier.isValidId(input.tempId)) {
-            supplier.tempToDest();
-            return;
-        }
-
-        supplier.sourceToTemp();
+    @Override
+    public void flush() throws IOException {
+        writer.write(sb.toString());
+        writer.flush();
     }
 }
