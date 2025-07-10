@@ -4,10 +4,14 @@
     {
       "label": "check-output-diff",
       "type": "shell",
-      "command": "bash",
+      "command": "colordiff",
       "args": [
-        "-c",
-        "export TERM=xterm-256color; diff --color=always -w app/src/main/resources/output.txt app/src/main/resources/expected.txt && echo \"$(tput setaf 2)Success$(tput sgr0)\" || echo \"$(tput setaf 1)Failed$(tput sgr0)\""
+        "--side-by-side",
+        "-w",
+        "app/src/main/resources/output.txt",
+        "app/src/main/resources/expected.txt",
+        "||",
+        "true"
       ],
       "group": "test",
       "presentation": {
@@ -17,10 +21,6 @@
         "panel": "shared",
         "showReuseMessage": false,
         "clear": true
-      },
-      "problemMatcher": [],
-      "runOptions": {
-        "reevaluateOnRerun": true
       }
     }
   ]

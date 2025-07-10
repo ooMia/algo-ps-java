@@ -4,3 +4,6 @@
 # Ignore Gradle build output directory
 build/
 app/bin/
+
+# Ignore macOS system files
+**/.DS_Store
