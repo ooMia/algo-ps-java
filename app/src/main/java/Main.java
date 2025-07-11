@@ -3,10 +3,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Deque;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +46,6 @@ public class Main {
 }
 
 interface IStructModifier {
-    int pushAndPop(int value);
 }
 
 interface IStructState {
@@ -57,8 +53,7 @@ interface IStructState {
 
 class Supplier implements ISupplier {
     final BufferedReader reader;
-    final Deque<Integer> queue;
-    final Iterator<QInput> nextIt;
+    private int nInput;
 
     private List<Integer> readNextIntegers() {
         try {
@@ -73,26 +68,7 @@ class Supplier implements ISupplier {
     public Supplier(BufferedReader br) {
         this.reader = br;
         try {
-            // 입력 읽기
-            reader.readLine(); // 첫 줄 무시
-            List<Integer> isStack = readNextIntegers();
-            List<Integer> initialTempValues = readNextIntegers();
-            reader.readLine(); // 넷째 줄 무시
-            List<Integer> nextValues = readNextIntegers();
-
-            // 초기화
-            this.nextIt = nextValues.stream()
-                    .map(QInput::new)
-                    .iterator();
-            this.queue = new ArrayDeque<>();
-
-            for (int i = 0; i < isStack.size(); ++i) {
-                boolean isStacked = isStack.get(i) == 1;
-                int initialTemp = initialTempValues.get(i);
-                if (isStacked == false) {
-                    queue.offerFirst(initialTemp);
-                }
-            }
+            this.nInput = readNextIntegers().get(0);
         } catch (Exception e) {
             throw new IllegalArgumentException();
         }
@@ -100,26 +76,26 @@ class Supplier implements ISupplier {
 
     @Override
     public QInput next() {
-        return nextIt.next();
+        try {
+            return new QInput(reader.readLine());
+        } catch (Exception e) {
+            throw new IllegalArgumentException();
+        } finally {
+            --nInput;
+        }
     }
 
     @Override
     public boolean hasNext() {
-        return nextIt.hasNext();
-    }
-
-    @Override
-    public int pushAndPop(int value) {
-        queue.offerLast(value);
-        return queue.pollFirst();
+        return nInput > 0;
     }
 }
 
 class QInput {
-    int value;
+    String line;
 
-    public QInput(int value) {
-        this.value = value;
+    public QInput(String line) {
+        this.line = line;
     }
 }
 
@@ -127,16 +103,28 @@ class Consumer implements IConsumer {
     final BufferedWriter writer;
     final ISupplier supplier;
     final StringBuilder sb = new StringBuilder();
+    private int callTime;
 
     public Consumer(BufferedWriter bw, ISupplier supplier) {
         this.writer = bw;
         this.supplier = supplier;
     }
 
+    private int recursion(String s, int l, int r) {
+        callTime++;
+        if (l >= r)
+            return 1;
+        else if (s.charAt(l) != s.charAt(r))
+            return 0;
+        else
+            return recursion(s, l + 1, r - 1);
+    }
+
     @Override
     public void consume(QInput input) throws IOException {
-        int value = supplier.pushAndPop(input.value);
-        sb.append(value).append(" ");
+        this.callTime = 0;
+        int isPalindrome = recursion(input.line, 0, input.line.length() - 1);
+        sb.append(isPalindrome).append(" ").append(callTime).append("\n");
     }
 
     @Override
