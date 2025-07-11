@@ -53,7 +53,9 @@ interface IStructState {
 
 class Supplier implements ISupplier {
     final BufferedReader reader;
-    private int nInput;
+
+    private boolean _toggle = true;
+    private QInput _cache;
 
     private List<Integer> readNextIntegers() {
         try {
@@ -68,7 +70,9 @@ class Supplier implements ISupplier {
     public Supplier(BufferedReader br) {
         this.reader = br;
         try {
-            this.nInput = readNextIntegers().get(0);
+            int nSort = readNextIntegers().get(1);
+            var numbers = readNextIntegers();
+            this._cache = new QInput(nSort, numbers);
         } catch (Exception e) {
             throw new IllegalArgumentException();
         }
@@ -76,26 +80,24 @@ class Supplier implements ISupplier {
 
     @Override
     public QInput next() {
-        try {
-            return new QInput(reader.readLine());
-        } catch (Exception e) {
-            throw new IllegalArgumentException();
-        } finally {
-            --nInput;
-        }
+        this._toggle = false;
+        return _cache;
     }
 
     @Override
     public boolean hasNext() {
-        return nInput > 0;
+        return this._toggle;
     }
+
 }
 
 class QInput {
-    String line;
+    int nRemainingStore;
+    List<Integer> numbers;
 
-    public QInput(String line) {
-        this.line = line;
+    public QInput(int nRemainingStore, List<Integer> numbers) {
+        this.nRemainingStore = nRemainingStore;
+        this.numbers = numbers;
     }
 }
 
@@ -103,28 +105,60 @@ class Consumer implements IConsumer {
     final BufferedWriter writer;
     final ISupplier supplier;
     final StringBuilder sb = new StringBuilder();
-    private int callTime;
+    private int nStore;
 
     public Consumer(BufferedWriter bw, ISupplier supplier) {
         this.writer = bw;
         this.supplier = supplier;
     }
 
-    private int recursion(String s, int l, int r) {
-        callTime++;
-        if (l >= r)
-            return 1;
-        else if (s.charAt(l) != s.charAt(r))
-            return 0;
-        else
-            return recursion(s, l + 1, r - 1);
-    }
 
     @Override
     public void consume(QInput input) throws IOException {
-        this.callTime = 0;
-        int isPalindrome = recursion(input.line, 0, input.line.length() - 1);
-        sb.append(isPalindrome).append(" ").append(callTime).append("\n");
+        this.nStore = input.nRemainingStore;
+        var numbers = input.numbers.stream().mapToInt(Integer::intValue).toArray();
+        merge_sort(numbers, 0, numbers.length - 1);
+        if (nStore > 0) {
+            sb.append("-1\n"); // nStore가 0보다 크면 -1 출력
+        }
+    }
+
+    private void merge_sort(int[] numbers, int p, int r) {
+        if (p < r) {
+            int q = (p + r) / 2; // 중간 지점
+            merge_sort(numbers, p, q); // 전반부 정렬
+            merge_sort(numbers, q + 1, r); // 후반부 정렬
+            merge(numbers, p, q, r); // 병합
+        }
+    }
+
+    private void merge(int[] numbers, int p, int q, int r) {
+        int i = p, j = q + 1, t = 0;
+        var tmp = new int[r - p + 1];
+
+        while (i <= q && j <= r) {
+            if (numbers[i] <= numbers[j]) {
+                tmp[t++] = numbers[i++];
+            } else {
+                tmp[t++] = numbers[j++];
+            }
+        }
+        while (i <= q) { // 왼쪽 배열 부분이 남은 경우
+            tmp[t++] = numbers[i++];
+        }
+        while (j <= r) { // 오른쪽 배열 부분이 남은 경우
+            tmp[t++] = numbers[j++];
+        }
+        i = p;
+        t = 0;
+        while (i <= r) { // 결과를 numbers[p..r]에 저장
+            nStore--;
+            numbers[i++] = tmp[t++];
+            if (nStore == 0) {
+                sb.append(numbers[i - 1]).append("\n");
+                return; // nStore가 0이 되면 결과를 출력하고 종료
+            }
+        }
     }
 
     @Override
