@@ -3,18 +3,22 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 interface ISupplier extends IStructModifier, IStructState {
     QInput next();
+
     boolean hasNext();
 }
 
 interface IConsumer {
     void consume(QInput input) throws IOException;
+
     void flush() throws IOException;
 }
 
@@ -45,6 +49,7 @@ public class Main {
 }
 
 interface IStructModifier {
+    int pushAndPop(int value);
 }
 
 interface IStructState {
@@ -52,21 +57,41 @@ interface IStructState {
 
 class Supplier implements ISupplier {
     final BufferedReader reader;
-    final List<QInput> balloons = new ArrayList<>();
-    int currentIndex = 0;
+    final Deque<Integer> queue;
+    final Iterator<QInput> nextIt;
+
+    private List<Integer> readNextIntegers() {
+        try {
+            return Arrays.stream(reader.readLine().split(" "))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
+    }
 
     public Supplier(BufferedReader br) {
         this.reader = br;
         try {
-            reader.readLine(); // 첫 줄은 무시
-            List<Integer> values = Arrays.stream(reader.readLine().split(" "))
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toList());
+            // 입력 읽기
+            reader.readLine(); // 첫 줄 무시
+            List<Integer> isStack = readNextIntegers();
+            List<Integer> initialTempValues = readNextIntegers();
+            reader.readLine(); // 넷째 줄 무시
+            List<Integer> nextValues = readNextIntegers();
 
-            for (int i = 0; i < values.size(); i++) {
-                QInput balloon = new QInput();
-                balloon.set(i + 1, values.get(i));
-                balloons.add(balloon);
+            // 초기화
+            this.nextIt = nextValues.stream()
+                    .map(QInput::new)
+                    .iterator();
+            this.queue = new ArrayDeque<>();
+
+            for (int i = 0; i < isStack.size(); ++i) {
+                boolean isStacked = isStack.get(i) == 1;
+                int initialTemp = initialTempValues.get(i);
+                if (isStacked == false) {
+                    queue.offerFirst(initialTemp);
+                }
             }
         } catch (Exception e) {
             throw new IllegalArgumentException();
@@ -75,51 +100,26 @@ class Supplier implements ISupplier {
 
     @Override
     public QInput next() {
-        if (balloons.isEmpty()) {
-            return null;
-        }
-        
-        QInput currentBalloon = balloons.get(currentIndex);
-        int moveCount = currentBalloon.value;
-        
-        // 현재 풍선을 제거
-        balloons.remove(currentIndex);
-        
-        // 모든 풍선을 터뜨렸으면 반환
-        if (balloons.isEmpty()) {
-            return currentBalloon;
-        }
-        
-        // 다음 풍선 위치 계산
-        if (moveCount > 0) {
-            // 양수: 오른쪽으로 이동
-            currentIndex = (currentIndex + moveCount - 1) % balloons.size();
-        } else {
-            // 음수: 왼쪽으로 이동
-            currentIndex = (currentIndex + moveCount) % balloons.size();
-            if (currentIndex < 0) {
-                currentIndex += balloons.size();
-            }
-        }
-        
-        return currentBalloon;
+        return nextIt.next();
     }
 
     @Override
     public boolean hasNext() {
-        return !balloons.isEmpty();
+        return nextIt.hasNext();
+    }
+
+    @Override
+    public int pushAndPop(int value) {
+        queue.offerLast(value);
+        return queue.pollFirst();
     }
 }
 
 class QInput {
-    int id;
     int value;
-    boolean used;
 
-    public void set(int id, int value) {
-        this.id = id;
+    public QInput(int value) {
         this.value = value;
-        this.used = false;
     }
 }
 
@@ -135,7 +135,8 @@ class Consumer implements IConsumer {
 
     @Override
     public void consume(QInput input) throws IOException {
-        sb.append(input.id).append(" ");
+        int value = supplier.pushAndPop(input.value);
+        sb.append(value).append(" ");
     }
 
     @Override
