@@ -3,7 +3,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,16 +56,16 @@ interface IStructState {
 
 class Supplier implements ISupplier {
     final BufferedReader reader;
+    private final Iterator<Integer> numbIterator;
+    private final QInput _cache;
 
-    private boolean _toggle = true;
-    private QInput _cache;
-
-    private List<Integer> readNextIntegers() {
+    private List<Integer> readMultiLineIntegers() {
         try {
-            return Arrays.stream(reader.readLine().split(" "))
+            return reader.lines()
+                    .flatMap(line -> Arrays.stream(line.split(" ")))
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             throw new IllegalArgumentException();
         }
     }
@@ -70,9 +73,10 @@ class Supplier implements ISupplier {
     public Supplier(BufferedReader br) {
         this.reader = br;
         try {
-            int nSort = readNextIntegers().get(1);
-            var numbers = readNextIntegers();
-            this._cache = new QInput(nSort, numbers);
+            List<Integer> numbers = readMultiLineIntegers();
+            this.numbIterator = numbers.iterator();
+            int max = numbers.stream().max(Integer::compareTo).orElse(numbers.get(0));
+            _cache = new QInput(max, numbers.get(0));
         } catch (Exception e) {
             throw new IllegalArgumentException();
         }
@@ -80,24 +84,28 @@ class Supplier implements ISupplier {
 
     @Override
     public QInput next() {
-        this._toggle = false;
+        int n = numbIterator.next();
+        _cache.set(n);
         return _cache;
     }
 
     @Override
     public boolean hasNext() {
-        return this._toggle;
+        return numbIterator.hasNext();
     }
-
 }
 
 class QInput {
-    int nRemainingStore;
-    List<Integer> numbers;
+    final int max;
+    int n;
 
-    public QInput(int nRemainingStore, List<Integer> numbers) {
-        this.nRemainingStore = nRemainingStore;
-        this.numbers = numbers;
+    public QInput(int max, int n) {
+        this.max = max;
+        this.n = n;
+    }
+
+    public void set(int n) {
+        this.n = n;
     }
 }
 
@@ -105,60 +113,31 @@ class Consumer implements IConsumer {
     final BufferedWriter writer;
     final ISupplier supplier;
     final StringBuilder sb = new StringBuilder();
-    private int nStore;
+
+    final List<String> dp = new ArrayList<>(Arrays.asList("-", "- -", "- -   - -"));
 
     public Consumer(BufferedWriter bw, ISupplier supplier) {
         this.writer = bw;
         this.supplier = supplier;
     }
 
+    private void initDp(int _max) {
+        int i = dp.size();
+        StringBuilder sb = new StringBuilder();
+        sb.append(dp.get(i - 1));
+        while (i <= _max) {
+            // 3 ** (3-1)
+            sb.append(" ".repeat((int) Math.pow(3, i - 1)));
+            sb.append(dp.get(i - 1));
+            dp.add(sb.toString());
+            i++;
+        }
+    }
 
     @Override
     public void consume(QInput input) throws IOException {
-        this.nStore = input.nRemainingStore;
-        var numbers = input.numbers.stream().mapToInt(Integer::intValue).toArray();
-        merge_sort(numbers, 0, numbers.length - 1);
-        if (nStore > 0) {
-            sb.append("-1\n"); // nStore가 0보다 크면 -1 출력
-        }
-    }
-
-    private void merge_sort(int[] numbers, int p, int r) {
-        if (p < r) {
-            int q = (p + r) / 2; // 중간 지점
-            merge_sort(numbers, p, q); // 전반부 정렬
-            merge_sort(numbers, q + 1, r); // 후반부 정렬
-            merge(numbers, p, q, r); // 병합
-        }
-    }
-
-    private void merge(int[] numbers, int p, int q, int r) {
-        int i = p, j = q + 1, t = 0;
-        var tmp = new int[r - p + 1];
-
-        while (i <= q && j <= r) {
-            if (numbers[i] <= numbers[j]) {
-                tmp[t++] = numbers[i++];
-            } else {
-                tmp[t++] = numbers[j++];
-            }
-        }
-        while (i <= q) { // 왼쪽 배열 부분이 남은 경우
-            tmp[t++] = numbers[i++];
-        }
-        while (j <= r) { // 오른쪽 배열 부분이 남은 경우
-            tmp[t++] = numbers[j++];
-        }
-        i = p;
-        t = 0;
-        while (i <= r) { // 결과를 numbers[p..r]에 저장
-            nStore--;
-            numbers[i++] = tmp[t++];
-            if (nStore == 0) {
-                sb.append(numbers[i - 1]).append("\n");
-                return; // nStore가 0이 되면 결과를 출력하고 종료
-            }
-        }
+        initDp(input.max);
+        sb.append(dp.get(input.n)).append("\n");
     }
 
     @Override
