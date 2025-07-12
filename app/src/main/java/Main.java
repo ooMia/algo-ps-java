@@ -8,9 +8,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 interface ISupplier extends IStructModifier, IStructState {
@@ -86,7 +84,7 @@ class Supplier implements ISupplier {
             throw new IllegalArgumentException();
         }
 
-        for (int initialNumber = 1; initialNumber <= range - nLimit + 1; initialNumber++) {
+        for (int initialNumber = 1; initialNumber <= range; initialNumber++) {
             if (nLimit == 1) {
                 System.out.println(initialNumber);
                 continue;
@@ -120,21 +118,14 @@ class Supplier implements ISupplier {
 class QInput {
     final int nLimit;
     final private List<Integer> numbers = new ArrayList<>();
-    final private Map<Integer, Boolean> isChosen = new HashMap<>();
 
     public QInput(int nLimit, int first) {
         this.nLimit = nLimit;
         this.numbers.add(first);
-        this.isChosen.put(first, true);
-    }
-
-    public int getLastNumber() {
-        return numbers.get(numbers.size() - 1);
     }
 
     public void choose(int number) {
         numbers.add(number);
-        isChosen.put(number, true);
     }
 
     public boolean isComplete() {
@@ -168,8 +159,7 @@ class Consumer implements IConsumer {
 
     @Override
     public void consume(QInput input) throws IOException {
-        for (int i = input.getLastNumber() + 1; i <= supplier.getRange(); i++) {
-
+        for (int i = 1; i <= supplier.getRange(); i++) {
             QInput newInput = input.copyOf();
             newInput.choose(i);
 
