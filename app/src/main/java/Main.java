@@ -86,7 +86,7 @@ class Supplier implements ISupplier {
             throw new IllegalArgumentException();
         }
 
-        for (int initialNumber = 1; initialNumber <= range; initialNumber++) {
+        for (int initialNumber = 1; initialNumber <= range - nLimit + 1; initialNumber++) {
             if (nLimit == 1) {
                 System.out.println(initialNumber);
                 continue;
@@ -128,8 +128,8 @@ class QInput {
         this.isChosen.put(first, true);
     }
 
-    public boolean isChosen(int number) {
-        return isChosen.getOrDefault(number, false);
+    public int getLastNumber() {
+        return numbers.get(numbers.size() - 1);
     }
 
     public void choose(int number) {
@@ -168,10 +168,7 @@ class Consumer implements IConsumer {
 
     @Override
     public void consume(QInput input) throws IOException {
-        for (int i = 1; i <= supplier.getRange(); i++) {
-            if (input.isChosen(i)) {
-                continue;
-            }
+        for (int i = input.getLastNumber() + 1; i <= supplier.getRange(); i++) {
 
             QInput newInput = input.copyOf();
             newInput.choose(i);
