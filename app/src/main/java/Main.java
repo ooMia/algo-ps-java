@@ -145,6 +145,10 @@ class QInput {
         }
         return copy;
     }
+
+    public int getLast() {
+        return numbers.get(numbers.size() - 1);
+    }
 }
 
 class Consumer implements IConsumer {
@@ -159,7 +163,7 @@ class Consumer implements IConsumer {
 
     @Override
     public void consume(QInput input) throws IOException {
-        for (int i = 1; i <= supplier.getRange(); i++) {
+        for (int i = input.getLast(); i <= supplier.getRange(); i++) {
             QInput newInput = input.copyOf();
             newInput.choose(i);
 
