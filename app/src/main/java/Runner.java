@@ -1,42 +1,38 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.PriorityQueue;
-import java.util.Stack;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int nLimit = 9;
-    final Stack<History> history = new Stack<>();
-
-    int[][] grid = new int[nLimit][nLimit];
-    PriorityQueue<Data> tasks = new PriorityQueue<>();
+    final int T;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
 
-        final int[][] cols = new int[nLimit][nLimit];
-        final int[][][] blocks = new int[nLimit / 3][nLimit / 3][nLimit];
         try {
-            for (int y = 0; y < nLimit; ++y) {
-                grid[y] = reader.readInts();
-                for (int x = 0; x < nLimit; ++x) {
-                    int value = grid[y][x];
-                    cols[x][y] = value;
-                    blocks[y / 3][x / 3][(y % 3) * 3 + (x % 3)] = value;
-                }
-            }
+            T = reader.readInts()[0];
+            for (int i = 0; i < T; ++i) {
+                reader.skipLine();
+                Set<Integer> setA = reader.readIntegers().stream().collect(Collectors.toSet());
+                Set<Integer> setB = reader.readIntegers().stream().collect(Collectors.toSet());
 
-            for (int y = 0; y < nLimit; ++y) {
-                for (int x = 0; x < nLimit; ++x) {
-                    if (grid[y][x] == 0) {
-                        var data = new Data(y, x, grid[y], cols[x], blocks[y / 3][x / 3]);
-                        tasks.offer(data);
-                    }
+                boolean isASubsetOfB = setB.containsAll(setA);
+                boolean isBSubsetOfA = setA.containsAll(setB);
+
+                if (isASubsetOfB && isBSubsetOfA) {
+                    sb.append("=\n");
+                } else if (isASubsetOfB) {
+                    sb.append("<\n");
+                } else if (isBSubsetOfA) {
+                    sb.append(">\n");
+                } else {
+                    sb.append("?\n");
                 }
             }
         } catch (IOException e) {
@@ -56,39 +52,6 @@ class Runner implements IRunner {
 
     @Override
     public void run() {
-        while (!tasks.isEmpty()) {
-            Data task = tasks.poll();
-            int y = task.y, x = task.x;
-
-            int possibilities = task.possibles.size();
-            if (possibilities < 1) {
-                var s = history.pop();
-                this.grid = s.grid;
-                this.tasks = s.tasks;
-                continue;
-            }
-
-            if (task.possibles.size() > 1) {
-                history.push(new History(grid, tasks, task));
-            }
-
-            int value = task.possibles.iterator().next();
-            grid[y][x] = value;
-
-            // System.err.println(task + " -> " + value);
-
-            for (Data affected : task.update(value, tasks)) {
-                tasks.remove(affected);
-                tasks.add(affected);
-            }
-        }
-
-        for (int y = 0; y < nLimit; ++y) {
-            for (int x = 0; x < nLimit; ++x) {
-                sb.append(grid[y][x]).append(' ');
-            }
-            sb.append('\n');
-        }
     }
 }
 
@@ -96,21 +59,4 @@ interface IRunner {
     void run();
 
     void flush();
-}
-
-class History {
-    final int[][] grid = new int[9][9];
-    final PriorityQueue<Data> tasks = new PriorityQueue<>();
-
-    History(final int[][] _grid, final PriorityQueue<Data> _tasks, final Data _chosen) {
-        for (int y = 0; y < 9; ++y) {
-            System.arraycopy(_grid[y], 0, grid[y], 0, 9);
-        }
-        Data data = _chosen.clone();
-        data.possibles.remove(data.possibles.iterator().next());
-        tasks.add(data);
-        for (Data task : _tasks) {
-            tasks.add(task.clone());
-        }
-    }
 }

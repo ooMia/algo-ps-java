@@ -31,6 +31,10 @@ class Reader implements IReader {
         return Arrays.stream(readInts()).boxed().collect(Collectors.toList());
     }
 
+    @Override
+    public List<String> lines() throws IOException {
+        return br.lines().collect(Collectors.toList());
+    }
 }
 
 interface IReader {
@@ -39,4 +43,6 @@ interface IReader {
     List<Integer> readIntegers() throws IOException;
 
     int[] readInts() throws IOException;
+
+    List<String> lines() throws IOException;
 }

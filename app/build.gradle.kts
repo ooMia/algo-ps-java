@@ -45,7 +45,7 @@ application {
 
 tasks.register("mergeSources") {
     val sourceDir = layout.projectDirectory.dir("src/main/java")
-    val outputFile = layout.buildDirectory.file("merged/Solution.java")
+    val outputFile = layout.buildDirectory.file("merged/Main.java")
     
     inputs.dir(sourceDir)
     outputs.file(outputFile)
