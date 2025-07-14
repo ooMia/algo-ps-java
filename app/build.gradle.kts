@@ -34,11 +34,68 @@ testing {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(15)
     }
 }
 
 application {
     // Define the main class for the application.
     mainClass = "Main"
+}
+
+tasks.register("mergeSources") {
+    val sourceDir = layout.projectDirectory.dir("src/main/java")
+    val outputFile = layout.buildDirectory.file("merged/Solution.java")
+    
+    inputs.dir(sourceDir)
+    outputs.file(outputFile)
+    
+    doLast {
+        val sourceDirFile = sourceDir.asFile
+        val outputFileFile = outputFile.get().asFile
+        
+        outputFileFile.parentFile.mkdirs()
+        
+        val mergedContent = StringBuilder()
+        val imports = mutableSetOf<String>()
+        val classContents = mutableListOf<String>()
+        
+        sourceDirFile.walkTopDown()
+            .filter { it.isFile && it.extension == "java" }
+            .forEach { file ->
+                val content = file.readText()
+                
+                // Extract imports
+                content.lines().forEach { line ->
+                    if (line.trim().startsWith("import ")) {
+                        imports.add(line.trim())
+                    }
+                }
+                
+                // Extract class/interface content (remove package and import statements)
+                val cleanContent = content.lines()
+                    .dropWhile { line -> 
+                        line.trim().startsWith("package ") || 
+                        line.trim().startsWith("import ") ||
+                        line.trim().startsWith("//") ||
+                        line.trim().isEmpty()
+                    }
+                    .joinToString("\n")
+                
+                if (cleanContent.isNotBlank()) {
+                    classContents.add(cleanContent)
+                }
+            }
+        
+        // Build merged file
+        imports.sorted().forEach { mergedContent.appendLine(it) }
+        mergedContent.appendLine()
+        classContents.forEach { 
+            mergedContent.appendLine(it)
+            mergedContent.appendLine()
+        }
+        
+        outputFileFile.writeText(mergedContent.toString())
+        println("Merged file created at: ${outputFileFile.absolutePath}")
+    }
 }
