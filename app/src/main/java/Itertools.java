@@ -3,7 +3,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Itertools<T> {
+class Itertools<T> {
 
     public List<Set<T>> combinations(List<T> iterable, int r) {
         List<Set<T>> result = new ArrayList<>();
