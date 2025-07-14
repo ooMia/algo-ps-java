@@ -174,42 +174,82 @@ tasks.register("mergeSources") {
         
         println("Scanning directory: ${sourceDirFile.absolutePath}")
         
-        sourceDirFile.walkTopDown()
-            .filter { it.isFile && it.extension == "java" }
-            .forEach { file ->
-                println("Processing file: ${file.name}")
-                val content = file.readText()
+        // *** Uncomment the following lines to process all Java files recursively ***
+        // 
+        // sourceDirFile.walkTopDown()
+        //     .filter { it.isFile && it.extension == "java" }
+        //     .forEach { file ->
+        //         println("Processing file: ${file.name}")
+        //         val content = file.readText()
                 
-                // Extract imports
-                allImports.addAll(extractImports(content))
+        //         // Extract imports
+        //         allImports.addAll(extractImports(content))
                 
-                // Clean and process content
-                val cleanContent = cleanSourceContent(content)
-                if (cleanContent.isNotBlank()) {
-                    val declarations = parseJavaDeclarations(cleanContent)
+        //         // Clean and process content
+        //         val cleanContent = cleanSourceContent(content)
+        //         if (cleanContent.isNotBlank()) {
+        //             val declarations = parseJavaDeclarations(cleanContent)
                     
-                    declarations.forEach { (name, declarationContent) ->
-                        println("  → Found declaration: $name")
+        //             declarations.forEach { (name, declarationContent) ->
+        //                 println("  → Found declaration: $name")
                         
-                        when {
-                            isMainClass(declarationContent) -> {
-                                mainClassContent.add(declarationContent)
-                                println("    → Added to mainClassContent")
-                            }
-                            isInterface(declarationContent) -> {
-                                val modifiedContent = removePublicModifier(declarationContent)
-                                interfaceContents.add(modifiedContent)
-                                println("    → Added to interfaceContents")
-                            }
-                            else -> {
-                                val modifiedContent = removePublicModifier(declarationContent)
-                                otherClassContents.add(modifiedContent)
-                                println("    → Added to otherClassContents")
-                            }
+        //                 when {
+        //                     isMainClass(declarationContent) -> {
+        //                         mainClassContent.add(declarationContent)
+        //                         println("    → Added to mainClassContent")
+        //                     }
+        //                     isInterface(declarationContent) -> {
+        //                         val modifiedContent = removePublicModifier(declarationContent)
+        //                         interfaceContents.add(modifiedContent)
+        //                         println("    → Added to interfaceContents")
+        //                     }
+        //                     else -> {
+        //                         val modifiedContent = removePublicModifier(declarationContent)
+        //                         otherClassContents.add(modifiedContent)
+        //                         println("    → Added to otherClassContents")
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        
+        // Process only java files in the source directory, not recursively 
+        sourceDirFile.listFiles { file -> 
+            file.isFile && file.extension == "java" 
+        }?.forEach { file ->
+            println("Processing file: ${file.name}")
+            val content = file.readText()
+            
+            // Extract imports
+            allImports.addAll(extractImports(content))
+            
+            // Clean and process content
+            val cleanContent = cleanSourceContent(content)
+            if (cleanContent.isNotBlank()) {
+                val declarations = parseJavaDeclarations(cleanContent)
+                
+                declarations.forEach { (name, declarationContent) ->
+                    println("  → Found declaration: $name")
+                    
+                    when {
+                        isMainClass(declarationContent) -> {
+                            mainClassContent.add(declarationContent)
+                            println("    → Added to mainClassContent")
+                        }
+                        isInterface(declarationContent) -> {
+                            val modifiedContent = removePublicModifier(declarationContent)
+                            interfaceContents.add(modifiedContent)
+                            println("    → Added to interfaceContents")
+                        }
+                        else -> {
+                            val modifiedContent = removePublicModifier(declarationContent)
+                            otherClassContents.add(modifiedContent)
+                            println("    → Added to otherClassContents")
                         }
                     }
                 }
             }
+        }
         
         println("\nBuilding merged file...")
         println("Main classes: ${mainClassContent.size}")

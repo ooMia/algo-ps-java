@@ -35,6 +35,11 @@ class Reader implements IReader {
     public List<String> lines() throws IOException {
         return br.lines().collect(Collectors.toList());
     }
+
+    @Override
+    public String line() throws IOException {
+        return br.readLine();
+    }
 }
 
 interface IReader {
@@ -45,4 +50,6 @@ interface IReader {
     int[] readInts() throws IOException;
 
     List<String> lines() throws IOException;
+
+    String line() throws IOException;
 }
