@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 class MainTest {
     @Test
     void checkMainDependencies() {
-        assertNotNull(Main.br);
-        assertNotNull(Main.bw);
+        assertNotNull(Solution.br);
+        assertNotNull(Solution.bw);
     }
 }

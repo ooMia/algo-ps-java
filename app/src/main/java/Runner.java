@@ -1,8 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 class Runner implements IRunner {
     final IReader reader;
@@ -18,22 +16,20 @@ class Runner implements IRunner {
         try {
             T = reader.readInts()[0];
             for (int i = 0; i < T; ++i) {
-                reader.skipLine();
-                Set<Integer> setA = reader.readIntegers().stream().collect(Collectors.toSet());
-                Set<Integer> setB = reader.readIntegers().stream().collect(Collectors.toSet());
+                int N, P;
+                int[] inputs = reader.readInts();
+                N = inputs[0];
+                P = inputs[1];
 
-                boolean isASubsetOfB = setB.containsAll(setA);
-                boolean isBSubsetOfA = setA.containsAll(setB);
-
-                if (isASubsetOfB && isBSubsetOfA) {
-                    sb.append("=\n");
-                } else if (isASubsetOfB) {
-                    sb.append("<\n");
-                } else if (isBSubsetOfA) {
-                    sb.append(">\n");
-                } else {
-                    sb.append("?\n");
+                int floor = 0;
+                int step = 0;
+                while (N-- > 0) {
+                    ++step;
+                    if (floor + step != P) {
+                        floor += step;
+                    }
                 }
+                sb.append(floor).append("\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
