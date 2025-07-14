@@ -1,3 +1,4 @@
+package temp;
 class AbilityBoard implements IAbilityBoard {
     final int N;
     final int[][] S;
