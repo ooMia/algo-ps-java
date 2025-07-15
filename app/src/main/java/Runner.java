@@ -7,28 +7,26 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, M;
-    final int[][] cumuls; // (0, 0)부터 (i, j)까지의 합
+    final int N, K;
+    final int[] numbers;
+    final int[] cumuls; // sigma(0, i)
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
 
         try {
-            var input = reader.readInts();
-            N = input[0];
-            M = input[1];
-            sb.ensureCapacity(M * 10);
+            var _nk = reader.readInts();
+            N = _nk[0];
+            K = _nk[1];
+            sb.ensureCapacity(10);
 
-            // (N+1) x (N+1) 크기로 설정, 0번째 행/열은 패딩
-            cumuls = new int[N + 1][N + 1];
+            numbers = reader.readInts(); // size N
+            cumuls = new int[N];
 
-            for (int iy = 1; iy <= N; ++iy) {
-                int[] numbers = reader.readInts();
-                for (int ix = 1; ix <= N; ++ix) {
-                    cumuls[iy][ix] = cumuls[iy - 1][ix] + cumuls[iy][ix - 1]
-                            - cumuls[iy - 1][ix - 1] + numbers[ix - 1];
-                }
+            cumuls[0] = numbers[0];
+            for (int i = 1; i < N; ++i) {
+                cumuls[i] = numbers[i] + cumuls[i - 1];
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -47,17 +45,22 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        for (int i = 0; i < M; ++i) {
-            var inputs = reader.readInts();
-            int x1 = inputs[0], y1 = inputs[1], x2 = inputs[2], y2 = inputs[3];
-            sb.append(sum(x1, y1, x2, y2)).append('\n');
+        int max = sum(0, K - 1);
+        for (int i = 1; i < N; ++i) {
+            int j = i + K - 1;
+            if (j >= N) {
+                break;
+            }
+            max = Math.max(max, sum(i, j));
         }
+        sb.append(max).append('\n');
     }
 
-    private int sum(int x1, int y1, int x2, int y2) {
-        // 1-based 인덱스를 그대로 사용, 경계 체크 불필요
-        return cumuls[x2][y2] - cumuls[x1 - 1][y2]
-                - cumuls[x2][y1 - 1] + cumuls[x1 - 1][y1 - 1];
+    private int sum(int iFrom, int iTo) {
+        if (iFrom <= 0) {
+            return cumuls[iTo];
+        }
+        return cumuls[iTo] - cumuls[iFrom - 1];
     }
 }
 
