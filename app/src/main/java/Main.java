@@ -5,18 +5,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class Main {
-    static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
     public static void main(String[] args) {
+        final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         try {
-            int T = Integer.parseInt(br.readLine().trim());
-            for (int i = 0; i < T; i++) {
+            int T = 1;
+            for (int i = 0; i < T; ++i) {
                 IRunner runner = new Runner(br, bw);
                 runner.run();
                 runner.flush();
             }
-
             br.close();
             bw.close();
         } catch (IOException e) {
