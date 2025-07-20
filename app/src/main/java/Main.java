@@ -10,9 +10,12 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            IRunner runner = new Runner(br, bw);
-            runner.run();
-            runner.flush();
+            int T = Integer.parseInt(br.readLine().trim());
+            for (int i = 0; i < T; i++) {
+                IRunner runner = new Runner(br, bw);
+                runner.run();
+                runner.flush();
+            }
 
             br.close();
             bw.close();
