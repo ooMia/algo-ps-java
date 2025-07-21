@@ -42,7 +42,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        Itertools.combinations(numbers, M)
+        Itertools.combinationsWithRepetition(numbers, M)
                 .forEach(l -> {
                     for (int val : l) {
                         sb.append(val).append(' ');
