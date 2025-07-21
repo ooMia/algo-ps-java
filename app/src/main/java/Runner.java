@@ -42,30 +42,14 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-      generatePermutations(0);
+        Itertools.combinations(numbers, M)
+                .forEach(l -> {
+                    for (int val : l) {
+                        sb.append(val).append(' ');
+                    }
+                    sb.append('\n');
+                });
     }
-
-    public void generatePermutations(int depth) {
-        // 베이스 케이스: 순열이 완성된 경우 (길이가 M에 도달)
-        if (depth == M) {
-            for (int val : result) {
-                sb.append(val).append(' ');
-            }
-            sb.append('\n');
-            return;
-        }
-
-        // 재귀 단계: 사용 가능한 각 숫자에 대해 탐색
-        for (int i = 0; i < N; i++) {
-            if (!visited[i]) {
-                visited[i] = true;
-                result[depth] = numbers[i];
-                generatePermutations(depth + 1);
-                visited[i] = false;
-            }
-        }
-    }
-
 }
 
 interface IRunner {
