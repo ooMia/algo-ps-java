@@ -41,7 +41,7 @@ class Runner implements IRunner {
     @Override
     public void run() throws IOException {
         Set<String> history = new HashSet<>();
-        Itertools.permutations(numbers, M).forEach(chosen -> {
+        Itertools.combinations(numbers, M).forEach(chosen -> {
             String key = Arrays.toString(chosen);
             if (!history.contains(key)) {
                 history.add(key);
