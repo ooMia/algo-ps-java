@@ -1,8 +1,10 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 class Runner implements IRunner {
     final IReader reader;
@@ -10,17 +12,32 @@ class Runner implements IRunner {
     final StringBuilder sb = new StringBuilder();
 
     final int N;
-    final Map<String, String[]> nodes;
+    final int[] dp;
+    final boolean[] visited;
+    final Map<Integer, List<Integer>> nodes;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
             N = reader.readInts()[0];
-            nodes = new HashMap<>(N);
-            for (int i = 0; i < N; i++) {
-                var line = reader.line().split(" ");
-                nodes.put(line[0], new String[] { line[1], line[2] });
+            dp = new int[N + 1];
+            visited = new boolean[N + 1];
+            nodes = new TreeMap<>();
+            for (int i = 0; i < N - 1; ++i) {
+                var line = reader.readIntegers();
+                var nodeA = line.get(0);
+                var nodeB = line.get(1);
+
+                if (!nodes.containsKey(nodeA)) {
+                    nodes.put(nodeA, new ArrayList<>());
+                }
+                nodes.get(nodeA).add(nodeB);
+
+                if (!nodes.containsKey(nodeB)) {
+                    nodes.put(nodeB, new ArrayList<>());
+                }
+                nodes.get(nodeB).add(nodeA);
             }
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -40,43 +57,23 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        preorder("A", 0);
-        sb.append("\n");
-        inorder("A", 0);
-        sb.append("\n");
-        postorder("A", 0);
-        sb.append("\n");
+        visit(1);
 
+        for (int i = 2; i <= N; ++i) {
+            sb.append(dp[i]).append('\n');
+        }
     }
 
-    private void preorder(String node, int nVisited) {
-        // root - left - right
-        if (nVisited == N || node.equals(".")) {
-            return;
-        }
-        sb.append(node);
-        preorder(nodes.get(node)[0], nVisited + 1);
-        preorder(nodes.get(node)[1], nVisited + 1);
-    }
+    private void visit(int node) {
+        visited[node] = true;
 
-    private void inorder(String node, int nVisited) {
-        // left - root - right
-        if (nVisited == N || node.equals(".")) {
-            return;
+        for (int child : nodes.get(node)) {
+            if (visited[child]) {
+                continue;
+            }
+            dp[child] = node;
+            visit(child);
         }
-        inorder(nodes.get(node)[0], nVisited + 1);
-        sb.append(node);
-        inorder(nodes.get(node)[1], nVisited + 1);
-    }
-
-    private void postorder(String node, int nVisited) {
-        // left - right - root
-        if (nVisited == N || node.equals(".")) {
-            return;
-        }
-        postorder(nodes.get(node)[0], nVisited + 1);
-        postorder(nodes.get(node)[1], nVisited + 1);
-        sb.append(node);
     }
 }
 
