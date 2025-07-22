@@ -2,16 +2,16 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, M; // N: number of items, M: number to choose from
-    final int[] numbers;
-    final int[] result; // to store the current permutation
-    final boolean[] visited; // to track used numbers
+    int N, M; // N: number of elements, M: length of sub-sequences
+    int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
@@ -22,9 +22,7 @@ class Runner implements IRunner {
             M = nm[1];
             numbers = reader.readInts();
             Arrays.sort(numbers);
-            result = new int[M];
-            visited = new boolean[N];
-            sb.ensureCapacity(20);
+            sb.ensureCapacity(M * N * N);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -42,13 +40,17 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        Itertools.combinationsWithRepetition(numbers, M)
-                .forEach(l -> {
-                    for (int val : l) {
-                        sb.append(val).append(' ');
-                    }
-                    sb.append('\n');
-                });
+        Set<String> history = new HashSet<>();
+        Itertools.permutations(numbers, M).forEach(chosen -> {
+            String key = Arrays.toString(chosen);
+            if (!history.contains(key)) {
+                history.add(key);
+                for (int i = 0; i < M; i++) {
+                    sb.append(chosen[i]).append(' ');
+                }
+                sb.append('\n');
+            }
+        });
     }
 }
 
