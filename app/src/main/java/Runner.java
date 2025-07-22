@@ -1,28 +1,29 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    int N, M; // N: number of elements, M: length of sub-sequences
-    int[] numbers;
+    int A, B, C; // res = A^B % C
+    Map<Integer, Integer> dp;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var nm = reader.readInts();
-            N = nm[0];
-            M = nm[1];
-            numbers = reader.readInts();
-            Arrays.sort(numbers);
-            sb.ensureCapacity(M * N * N);
+            var _abc = reader.readInts();
+            A = _abc[0];
+            B = _abc[1];
+            C = _abc[2];
+            dp = new HashMap<>();
+            dp.put(0, 1);
+            dp.put(1, A % C);
+            sb.ensureCapacity(20);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -40,17 +41,32 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        Set<String> history = new HashSet<>();
-        Itertools.combinationsWithRepetition(numbers, M).forEach(chosen -> {
-            String key = Arrays.toString(chosen);
-            if (!history.contains(key)) {
-                history.add(key);
-                for (int i = 0; i < M; i++) {
-                    sb.append(chosen[i]).append(' ');
-                }
-                sb.append('\n');
-            }
-        });
+        int res = power(A, B);
+        sb.append(res).append('\n');
+    }
+
+    private int power(int a, int b) {
+        if (dp.containsKey(b)) {
+            return dp.get(b);
+        }
+
+        int half, res;
+        if (b % 2 == 0) {
+            half = power(a, b / 2);
+            res = product(half, half);
+            dp.put(b, res);
+        } else {
+            half = power(a, (b - 1) / 2);
+            res = product(half, half);
+            dp.put(b - 1, res);
+            res = product(res, a % C);
+        }
+        System.err.println("power(" + a + ", " + b + ") = " + res);
+        return res;
+    }
+
+    private int product(int a, int b) {
+        return (int) (((long) a % C) * ((long) b % C) % C);
     }
 }
 
