@@ -9,20 +9,19 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    int A, B, C; // res = A^B % C
-    Map<Integer, Integer> dp;
+    final int N;
+    final Map<String, String[]> nodes;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _abc = reader.readInts();
-            A = _abc[0];
-            B = _abc[1];
-            C = _abc[2];
-            dp = new HashMap<>();
-            dp.put(0, 1);
-            dp.put(1, A % C);
+            N = reader.readInts()[0];
+            nodes = new HashMap<>(N);
+            for (int i = 0; i < N; i++) {
+                var line = reader.line().split(" ");
+                nodes.put(line[0], new String[] { line[1], line[2] });
+            }
             sb.ensureCapacity(20);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -41,32 +40,43 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        int res = power(A, B);
-        sb.append(res).append('\n');
+        preorder("A", 0);
+        sb.append("\n");
+        inorder("A", 0);
+        sb.append("\n");
+        postorder("A", 0);
+        sb.append("\n");
+
     }
 
-    private int power(int a, int b) {
-        if (dp.containsKey(b)) {
-            return dp.get(b);
+    private void preorder(String node, int nVisited) {
+        // root - left - right
+        if (nVisited == N || node.equals(".")) {
+            return;
         }
-
-        int half, res;
-        if (b % 2 == 0) {
-            half = power(a, b / 2);
-            res = product(half, half);
-            dp.put(b, res);
-        } else {
-            half = power(a, (b - 1) / 2);
-            res = product(half, half);
-            dp.put(b - 1, res);
-            res = product(res, a % C);
-        }
-        System.err.println("power(" + a + ", " + b + ") = " + res);
-        return res;
+        sb.append(node);
+        preorder(nodes.get(node)[0], nVisited + 1);
+        preorder(nodes.get(node)[1], nVisited + 1);
     }
 
-    private int product(int a, int b) {
-        return (int) (((long) a % C) * ((long) b % C) % C);
+    private void inorder(String node, int nVisited) {
+        // left - root - right
+        if (nVisited == N || node.equals(".")) {
+            return;
+        }
+        inorder(nodes.get(node)[0], nVisited + 1);
+        sb.append(node);
+        inorder(nodes.get(node)[1], nVisited + 1);
+    }
+
+    private void postorder(String node, int nVisited) {
+        // left - right - root
+        if (nVisited == N || node.equals(".")) {
+            return;
+        }
+        postorder(nodes.get(node)[0], nVisited + 1);
+        postorder(nodes.get(node)[1], nVisited + 1);
+        sb.append(node);
     }
 }
 
