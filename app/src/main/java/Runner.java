@@ -1,35 +1,33 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N; // N: number of houses
-    final int[][] costs; // costs[n][rgb]: cost of painting house n with color rgb
+    final int N; // N: depth of a triangle
+    final int[][] values; // values[depth][index]: value at a specific depth and index
 
-    private final int[][] dp; // dp[n][rgb]: minimum cost to paint up to house n with color rgb
+    private final int[][] dp; // dp[depth][index]: maximum sum of values from the top to a specific depth and
+                              // index
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
             N = reader.readInts()[0];
-            costs = new int[N + 1][3]; // 1-indexed
-            dp = new int[N + 1][3]; // 1-indexed
-            for (int n = 0; n < N; ++n) {
+            values = new int[N + 1][N + 1];
+            dp = new int[N + 1][N + 1];
+            for (int depth = 1; depth <= N; ++depth) {
                 var line = reader.readInts();
-                for (int rgb = 0; rgb < 3; ++rgb) {
-                    costs[n + 1][rgb] = line[rgb];
-                    if (rgb == 0) {
-                        dp[n + 1][rgb] = Math.min(dp[n][1], dp[n][2]) + costs[n + 1][rgb];
-                    } else if (rgb == 1) {
-                        dp[n + 1][rgb] = Math.min(dp[n][0], dp[n][2]) + costs[n + 1][rgb];
-                    } else if (rgb == 2) {
-                        dp[n + 1][rgb] = Math.min(dp[n][0], dp[n][1]) + costs[n + 1][rgb];
-                    }
+                for (int i = 1; i <= depth; ++i) {
+                    values[depth][i] = line[i - 1];
+                    var left = dp[depth - 1][i - 1];
+                    var right = dp[depth - 1][i];
+                    dp[depth][i] = Math.max(left, right) + values[depth][i];
                 }
             }
             sb.ensureCapacity(20);
@@ -50,11 +48,10 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        int minCost = Math.min(dp[N][0], Math.min(dp[N][1], dp[N][2]));
-        sb.append(minCost).append('\n');
+        var max = Arrays.stream(dp[N]).max().orElseThrow();
+        sb.append(max).append('\n');
     }
 }
-
 
 interface IRunner {
     void run() throws IOException;
