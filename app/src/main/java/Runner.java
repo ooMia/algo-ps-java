@@ -7,24 +7,32 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int V, E; // V: number of vertices (1...V), E: number of edges
-    final int K; // K: starting vertex
-    final Graph graph; // from -> (to -> weight)
+    final int N; // N: number of houses
+    final int[][] costs; // costs[n][rgb]: cost of painting house n with color rgb
+
+    private final int[][] dp; // dp[n][rgb]: minimum cost to paint up to house n with color rgb
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _ve = reader.readInts();
-            V = _ve[0];
-            E = _ve[1];
-            K = reader.readInts()[0];
-            graph = new Graph(V, E);
-            for (int i = 0; i < E; ++i) {
+            N = reader.readInts()[0];
+            costs = new int[N + 1][3]; // 1-indexed
+            dp = new int[N + 1][3]; // 1-indexed
+            for (int n = 0; n < N; ++n) {
                 var line = reader.readInts();
-                graph.addEdge(line[0], line[1], line[2]);
+                for (int rgb = 0; rgb < 3; ++rgb) {
+                    costs[n + 1][rgb] = line[rgb];
+                    if (rgb == 0) {
+                        dp[n + 1][rgb] = Math.min(dp[n][1], dp[n][2]) + costs[n + 1][rgb];
+                    } else if (rgb == 1) {
+                        dp[n + 1][rgb] = Math.min(dp[n][0], dp[n][2]) + costs[n + 1][rgb];
+                    } else if (rgb == 2) {
+                        dp[n + 1][rgb] = Math.min(dp[n][0], dp[n][1]) + costs[n + 1][rgb];
+                    }
+                }
             }
-            sb.ensureCapacity(V * 2);
+            sb.ensureCapacity(20);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -42,14 +50,8 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        for (int v = 1; v <= V; ++v) {
-            Integer route = graph.route(K, v);
-            if (route == null) {
-                sb.append("INF\n");
-            } else {
-                sb.append(route).append('\n');
-            }
-        }
+        int minCost = Math.min(dp[N][0], Math.min(dp[N][1], dp[N][2]));
+        sb.append(minCost).append('\n');
     }
 }
 
