@@ -1,34 +1,25 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N; // N: depth of a triangle
-    final int[][] values; // values[depth][index]: value at a specific depth and index
-
-    private final int[][] dp; // dp[depth][index]: maximum sum of values from the top to a specific depth and
-                              // index
+    final int nRows = 2, nCols;
+    final int[][] values;
+    final int[][] dp;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            N = reader.readInts()[0];
-            values = new int[N + 1][N + 1];
-            dp = new int[N + 1][N + 1];
-            for (int depth = 1; depth <= N; ++depth) {
-                var line = reader.readInts();
-                for (int i = 1; i <= depth; ++i) {
-                    values[depth][i] = line[i - 1];
-                    var left = dp[depth - 1][i - 1];
-                    var right = dp[depth - 1][i];
-                    dp[depth][i] = Math.max(left, right) + values[depth][i];
-                }
+            nCols = reader.readInts()[0];
+            values = new int[nRows][];
+            dp = new int[nRows][nCols];
+            for (int i = 0; i < nRows; ++i) {
+                values[i] = reader.readInts();
             }
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -48,8 +39,30 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var max = Arrays.stream(dp[N]).max().orElseThrow();
-        sb.append(max).append('\n');
+        for (int col = 0; col < nCols; ++col) {
+            if (col == 0) {
+                dp[0][col] = values[0][col];
+                dp[1][col] = values[1][col];
+            } else if (col == 1) {
+                dp[0][col] = dp[1][col - 1] + values[0][col];
+                dp[1][col] = dp[0][col - 1] + values[1][col];
+            } else {
+                {
+                    // row 0
+                    var case1 = dp[1][col - 1] + values[0][col];
+                    var case2 = dp[1][col - 2] + values[0][col];
+                    dp[0][col] = Math.max(case1, case2);
+                }
+                {
+                    // row 1
+                    var case1 = dp[0][col - 1] + values[1][col];
+                    var case2 = dp[0][col - 2] + values[1][col];
+                    dp[1][col] = Math.max(case1, case2);
+                }
+            }
+        }
+        var result = Math.max(dp[0][nCols - 1], dp[1][nCols - 1]);
+        sb.append(result).append('\n');
     }
 }
 
