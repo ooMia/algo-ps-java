@@ -8,14 +8,14 @@ class Runner implements IRunner {
     final StringBuilder sb = new StringBuilder();
 
     final int N;
-    final int[] fibo;
+    final long[] fibo;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
             N = reader.readInts()[0];
-            fibo = new int[N + 1];
+            fibo = new long[N + 1];
             fibo[0] = 0;
             fibo[1] = 1;
             sb.ensureCapacity(20);
