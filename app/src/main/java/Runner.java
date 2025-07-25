@@ -7,13 +7,17 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N;
+    final int N; // N: length of string
+    final String[] tokens;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            N = reader.readInts()[0];
+            tokens = new String[2];
+            tokens[0] = reader.line();
+            tokens[1] = reader.line();
+            N = tokens[0].length();
             sb.ensureCapacity(20);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -32,29 +36,20 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        int q1, q2, q3, q4, axis;
-        q1 = q2 = q3 = q4 = axis = 0;
-        for (int n = 0; n < N; ++n) {
-            var input = reader.readInts();
-            int x = input[0];
-            int y = input[1];
-            if ( x == 0 || y == 0){
-                axis++;
-            } else if (x > 0 && y > 0) {
-                q1++;
-            } else if (x < 0 && y > 0) {
-                q2++;
-            } else if (x < 0 && y < 0) {
-                q3++;
-            } else {
-                q4++;
+        int n = tokens[0].length();
+        int m = tokens[1].length();
+        int[][] dp = new int[n + 1][m + 1];
+
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 1; j <= m; ++j) {
+                if (tokens[0].charAt(i - 1) == tokens[1].charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
             }
         }
-        sb.append("Q1: ").append(q1).append("\n");
-        sb.append("Q2: ").append(q2).append("\n");
-        sb.append("Q3: ").append(q3).append("\n");
-        sb.append("Q4: ").append(q4).append("\n");
-        sb.append("AXIS: ").append(axis).append("\n");
+        sb.append(dp[n][m]).append('\n');
     }
 }
 
