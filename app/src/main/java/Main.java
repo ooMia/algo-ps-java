@@ -9,7 +9,7 @@ public class Main {
         final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         try {
-            int T = Integer.parseInt(br.readLine().trim());
+            int T = 1;
             for (int i = 0; i < T; ++i) {
                 IRunner runner = new Runner(br, bw);
                 runner.run();

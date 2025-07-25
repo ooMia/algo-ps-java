@@ -7,20 +7,13 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int nRows = 2, nCols;
-    final int[][] values;
-    final int[][] dp;
+    final int N;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            nCols = reader.readInts()[0];
-            values = new int[nRows][];
-            dp = new int[nRows][nCols];
-            for (int i = 0; i < nRows; ++i) {
-                values[i] = reader.readInts();
-            }
+            N = reader.readInts()[0];
             sb.ensureCapacity(20);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -39,30 +32,29 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        for (int col = 0; col < nCols; ++col) {
-            if (col == 0) {
-                dp[0][col] = values[0][col];
-                dp[1][col] = values[1][col];
-            } else if (col == 1) {
-                dp[0][col] = dp[1][col - 1] + values[0][col];
-                dp[1][col] = dp[0][col - 1] + values[1][col];
+        int q1, q2, q3, q4, axis;
+        q1 = q2 = q3 = q4 = axis = 0;
+        for (int n = 0; n < N; ++n) {
+            var input = reader.readInts();
+            int x = input[0];
+            int y = input[1];
+            if ( x == 0 || y == 0){
+                axis++;
+            } else if (x > 0 && y > 0) {
+                q1++;
+            } else if (x < 0 && y > 0) {
+                q2++;
+            } else if (x < 0 && y < 0) {
+                q3++;
             } else {
-                {
-                    // row 0
-                    var case1 = dp[1][col - 1] + values[0][col];
-                    var case2 = dp[1][col - 2] + values[0][col];
-                    dp[0][col] = Math.max(case1, case2);
-                }
-                {
-                    // row 1
-                    var case1 = dp[0][col - 1] + values[1][col];
-                    var case2 = dp[0][col - 2] + values[1][col];
-                    dp[1][col] = Math.max(case1, case2);
-                }
+                q4++;
             }
         }
-        var result = Math.max(dp[0][nCols - 1], dp[1][nCols - 1]);
-        sb.append(result).append('\n');
+        sb.append("Q1: ").append(q1).append("\n");
+        sb.append("Q2: ").append(q2).append("\n");
+        sb.append("Q3: ").append(q3).append("\n");
+        sb.append("Q4: ").append(q4).append("\n");
+        sb.append("AXIS: ").append(axis).append("\n");
     }
 }
 
