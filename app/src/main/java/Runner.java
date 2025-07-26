@@ -8,7 +8,7 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, X;
+    final int N;
     final int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
@@ -18,7 +18,6 @@ class Runner implements IRunner {
             N = reader.readInts()[0];
             numbers = reader.readInts();
             Arrays.sort(numbers);
-            X = reader.readInts()[0];
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -36,21 +35,28 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        int count = 0;
+        int min = Integer.MAX_VALUE;
+        int[] result = new int[2];
+
         int iLeft = 0, iRight = N - 1;
         while (iLeft < iRight) {
-            int sum = numbers[iLeft] + numbers[iRight];
-            if (sum == X) {
-                count++;
-                iLeft++;
-                iRight--;
-            } else if (sum < X) {
+            var vLeft = numbers[iLeft];
+            var vRight = numbers[iRight];
+
+            System.err.println(vLeft + " + " + vRight);
+            int sum = vLeft + vRight;
+            if (Math.abs(sum) < Math.abs(min)) {
+                min = sum;
+                result[0] = vLeft;
+                result[1] = vRight;
+            }
+            if (sum <= 0) {
                 iLeft++;
             } else {
                 iRight--;
             }
         }
-        sb.append(count).append('\n');
+        sb.append(result[0]).append(' ').append(result[1]).append('\n');
     }
 }
 
