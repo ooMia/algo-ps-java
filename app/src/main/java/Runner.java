@@ -1,8 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
 
 class Runner implements IRunner {
     final IReader reader;
@@ -37,51 +35,38 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        Queue<Data> q = new LinkedList<>();
-        q.offer(new Data(N, 0));
-
-        while (!q.isEmpty()) {
-            Data current = q.poll();
-            if (current.position == K) {
-                sb.append(current.nMove).append('\n');
-                int nAnswer = 1;
-                while (!q.isEmpty()) {
-                    Data next = q.poll();
-                    if (next.position == K && next.nMove == current.nMove) {
-                        nAnswer++;
-                    }
-                }
-                sb.append(nAnswer).append('\n');
-                return;
-            }
-
-            int[] modifier = { 1, -1, 2 };
-            for (int mod : modifier) {
-                int next = mod == 2 ? current.position * 2 : current.position + mod;
-                if (next < 0 || 100_000 < next) {
-                    continue;
-                }
-                if (dp[next] == 0 || current.nMove + 1 <= dp[next]) {
-                    dp[next] = current.nMove + 1;
-                    q.add(new Data(next, current.nMove + 1));
-                }
-            }
-        }
+        int res = solve(N, K);
+        sb.append(res).append('\n');
     }
+
+    private int solve(int n, int k) {
+        System.err.println("solve(" + n + ", " + k + ")");
+        // K가 홀수면 -1 +1 구해서 짝수로 만들고
+        // K가 짝수면 N과 가장 가까운 짝수와 비교하고
+        // K가 N의 거듭제곱 꼴이면 바로 반환
+        if (k <= n)
+            return n - k;
+        if (dp[k] != 0)
+            return dp[k];
+        if (n == 0) {
+            return dp[k] = solve(1, k) + 1;
+        }
+
+        if (k % 2 == 1) {
+            int case1 = solve(n, k - 1) + 1;
+            int case2 = solve(n, k + 1) + 1;
+            return dp[k] = Math.min(case1, case2);
+        }
+        while (n < k && k % 2 == 0) {
+            k /= 2;
+        }
+        return dp[k] = solve(n, k);
+    }
+
 }
 
 interface IRunner {
     void run() throws IOException;
 
     void flush();
-}
-
-class Data {
-    int position;
-    int nMove;
-
-    Data(int position, int nMove) {
-        this.position = position;
-        this.nMove = nMove;
-    }
 }
