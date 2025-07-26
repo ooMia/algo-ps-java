@@ -1,26 +1,25 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final long N;
-    final int mod = 1_000_000;
-    final int[] fibo;
+    final int N, K; // N, K: location of A and B; 0 <= N, K <= 10^6
+    final int[] dp;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            N = Long.parseLong(reader.line().trim());
-            int fiboLength = (int) Math.min(N, 1_500_001L);
-            fibo = new int[fiboLength + 1];
-            fibo[0] = 0;
-            fibo[1] = 1;
-            sb.ensureCapacity(20);
+            var _nk = reader.readInts();
+            N = _nk[0];
+            K = _nk[1];
+            dp = new int[100_001];
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -38,22 +37,36 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        if (N == 1) {
-            sb.append(fibo[1]).append('\n');
-            return;
-        }
+        Queue<Data> q = new LinkedList<>();
+        q.offer(new Data(N, 0));
 
-        for (int i = 2; i <= N; ++i) {
-            fibo[i] = (fibo[i - 1] + fibo[i - 2]) % mod;
-
-            if (fibo[i - 1] == fibo[0] && fibo[i] == fibo[1]) {
-                int cycleLength = i - 1;
-                i = (int) (N % cycleLength);
-                sb.append(fibo[i]).append('\n');
+        while (!q.isEmpty()) {
+            Data current = q.poll();
+            if (current.position == K) {
+                sb.append(current.nMove).append('\n');
+                int nAnswer = 1;
+                while (!q.isEmpty()) {
+                    Data next = q.poll();
+                    if (next.position == K && next.nMove == current.nMove) {
+                        nAnswer++;
+                    }
+                }
+                sb.append(nAnswer).append('\n');
                 return;
             }
+
+            int[] modifier = { 1, -1, 2 };
+            for (int mod : modifier) {
+                int next = mod == 2 ? current.position * 2 : current.position + mod;
+                if (next < 0 || 100_000 < next) {
+                    continue;
+                }
+                if (dp[next] == 0 || current.nMove + 1 <= dp[next]) {
+                    dp[next] = current.nMove + 1;
+                    q.add(new Data(next, current.nMove + 1));
+                }
+            }
         }
-        sb.append(fibo[(int) N]).append('\n');
     }
 }
 
@@ -61,4 +74,14 @@ interface IRunner {
     void run() throws IOException;
 
     void flush();
+}
+
+class Data {
+    int position;
+    int nMove;
+
+    Data(int position, int nMove) {
+        this.position = position;
+        this.nMove = nMove;
+    }
 }
