@@ -11,9 +11,7 @@ class Runner implements IRunner {
     final StringBuilder sb = new StringBuilder();
 
     final int N;
-    final PriorityQueue<Integer> pq = new PriorityQueue<>(
-            (o1, o2) -> Integer.compare(o2, o1) // Max-heap
-    );
+    final PriorityQueue<Integer> pq = new PriorityQueue<>();
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
@@ -48,8 +46,7 @@ class Runner implements IRunner {
         if (o == 0) {
             Integer res = pq.poll();
             sb.append(res != null ? res : 0).append("\n");
-        }
-        else {
+        } else {
             pq.offer(o);
         }
     }
