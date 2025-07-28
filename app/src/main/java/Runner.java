@@ -1,23 +1,38 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N;
-    final int[] numbers;
+    char[][] grid = new char[9][9];
+    boolean[][] rowUsed = new boolean[9][10];
+    boolean[][] colUsed = new boolean[9][10];
+    boolean[][] boxUsed = new boolean[9][10];
+    List<int[]> blanks = new ArrayList<>();
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            N = reader.readInts()[0];
-            numbers = reader.readInts();
-            Arrays.sort(numbers);
+            for (int y = 0; y < 9; ++y) {
+                grid[y] = reader.line().toCharArray();
+                for (int x = 0; x < 9; ++x) {
+                    int num = grid[y][x] - '0';
+                    if (num == 0) {
+                        blanks.add(new int[] { y, x });
+                    } else {
+                        int box = (y / 3) * 3 + (x / 3);
+                        rowUsed[y][num] = true;
+                        colUsed[x][num] = true;
+                        boxUsed[box][num] = true;
+                    }
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -34,34 +49,37 @@ class Runner implements IRunner {
     }
 
     @Override
-    public void run() throws IOException {
-        int min = Integer.MAX_VALUE;
-        int[] result = new int[2];
-
-        int iLeft = 0, iRight = N - 1;
-        while (iLeft < iRight) {
-            var vLeft = numbers[iLeft];
-            var vRight = numbers[iRight];
-
-            System.err.println(vLeft + " + " + vRight);
-            int sum = vLeft + vRight;
-            if (Math.abs(sum) < Math.abs(min)) {
-                min = sum;
-                result[0] = vLeft;
-                result[1] = vRight;
+    public void run() {
+        solve(0);
+        for (int y = 0; y < 9; ++y) {
+            for (int x = 0; x < 9; ++x) {
+                sb.append(grid[y][x]);
             }
-            if (sum <= 0) {
-                iLeft++;
-            } else {
-                iRight--;
+            sb.append('\n');
+        }
+    }
+
+    private boolean solve(int idx) {
+        if (idx == blanks.size())
+            return true;
+        int y = blanks.get(idx)[0], x = blanks.get(idx)[1];
+        int box = (y / 3) * 3 + (x / 3);
+        for (int num = 1; num <= 9; ++num) {
+            if (!rowUsed[y][num] && !colUsed[x][num] && !boxUsed[box][num]) {
+                grid[y][x] = (char) ('0' + num);
+                rowUsed[y][num] = colUsed[x][num] = boxUsed[box][num] = true;
+                if (solve(idx + 1))
+                    return true;
+                grid[y][x] = '0';
+                rowUsed[y][num] = colUsed[x][num] = boxUsed[box][num] = false;
             }
         }
-        sb.append(result[0]).append(' ').append(result[1]).append('\n');
+        return false;
     }
 }
 
 interface IRunner {
     void run() throws IOException;
 
-    void flush();
+    void flush() throws IOException;
 }
