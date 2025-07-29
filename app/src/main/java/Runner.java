@@ -7,17 +7,22 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N; // N: length of string
-    final String[] tokens;
+    final Solution solution = new Solution();
+    final int[] schedules;
+    final int[][] timelogs;
+    final int startday;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            tokens = new String[2];
-            tokens[0] = reader.line();
-            tokens[1] = reader.line();
-            N = tokens[0].length();
+            schedules = reader.readInts();
+            timelogs = new int[schedules.length][];
+            for (int i = 0; i < schedules.length; i++) {
+                timelogs[i] = reader.readInts();
+            }
+            startday = reader.readInts()[0];
+
             sb.ensureCapacity(20);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -36,39 +41,11 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        int n = tokens[0].length();
-        int m = tokens[1].length();
-        int[][] dp = new int[n + 1][m + 1];
-
-        for (int i = 1; i <= n; ++i) {
-            for (int j = 1; j <= m; ++j) {
-                if (tokens[0].charAt(i - 1) == tokens[1].charAt(j - 1)) {
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
-                } else {
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-                }
-            }
-        }
-
-        var res = dp[n][m];
+        var res = new Solution().solution(
+                schedules,
+                timelogs,
+                startday);
         sb.append(res).append('\n');
-        if (res != 0) {
-            int y = n, x = m;
-            StringBuilder lcs = new StringBuilder();
-            while (y > 0 && x > 0) {
-                if (tokens[0].charAt(y - 1) == tokens[1].charAt(x - 1)) {
-                    lcs.append(tokens[0].charAt(y - 1));
-                    --y;
-                    --x;
-                } else if (dp[y - 1][x] >= dp[y][x - 1]) {
-                    --y;
-                } else {
-                    --x;
-                }
-            }
-            lcs.reverse();
-            sb.append(lcs).append('\n');
-        }
     }
 }
 
