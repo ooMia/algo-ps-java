@@ -1,18 +1,20 @@
-class Solution {
-    public String solution(String my_string, String overwrite_string, int s) {
-        StringBuilder sb = new StringBuilder();
+import java.util.HashSet;
 
-        int i = 0;
-        while (i < my_string.length()) {
-            if (i == s) {
-                for (int j = 0; j < overwrite_string.length(); ++j, ++i) {
-                    sb.append(overwrite_string.charAt(j));
-                }
-            } else {
-                sb.append(my_string.charAt(i++));
+class Solution {
+    public int solution(int[] s1, int[] s2) {
+        // s1 집합 - s2 집합 (차집합으로 사라진 원소 찾기)
+        // s1에서 s2에 없는 원소를 찾아야 함
+        // s1과 s2는 정렬되어 있지 않음
+
+        HashSet<Integer> set = new HashSet<>();
+        for (int num : s1) {
+            set.add(num);
+        }
+        for (int num : s2) {
+            if (set.contains(num)) {
+                set.remove(num);
             }
         }
-
-        return sb.toString();
+        return set.isEmpty() ? -1 : set.iterator().next();
     }
 }
