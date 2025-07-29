@@ -1,19 +1,16 @@
-import java.util.Map;
+import java.math.BigInteger;
 
 class Solution {
-    public String solution(String rsp) {
-        Map<Character, Character> morse = Map.ofEntries(
-                Map.entry('2', '0'),
-                Map.entry('0', '5'),
-                Map.entry('5', '2'));
+    public int solution(int balls, int share) {
+        return combination(balls, share);
+    }
 
-        StringBuilder answer = new StringBuilder();
-        for (char c : rsp.toCharArray()) {
-            Character decoded = morse.get(c);
-            if (decoded != null) {
-                answer.append(decoded);
-            }
+    int combination(int n, int m) {
+        BigInteger res = BigInteger.ONE;
+        for (int i = 0; i < m; i++) {
+            res = res.multiply(BigInteger.valueOf(n - i));
+            res = res.divide(BigInteger.valueOf(i + 1));
         }
-        return answer.toString();
+        return res.intValue();
     }
 }

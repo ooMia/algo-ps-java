@@ -34,7 +34,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(letter);
+        var res = new Solution().solution(30, 15);
         sb.append(res).append('\n');
     }
 }
