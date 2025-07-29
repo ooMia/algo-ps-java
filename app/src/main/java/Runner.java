@@ -8,16 +8,19 @@ class Runner implements IRunner {
     final StringBuilder sb = new StringBuilder();
 
     final Solution solution = new Solution();
-    final int n, w, num;
+    final String videoLen, pos, opStart, opEnd;
+    final String[] commands;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var input = reader.readInts();
-            n = input[0];
-            w = input[1];
-            num = input[2];
+            var input = reader.line().split(" ");
+            videoLen = input[0];
+            pos = input[1];
+            opStart = input[2];
+            opEnd = input[3];
+            commands = reader.line().split(" ");
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -37,7 +40,9 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(n, w, num);
+        var res = new Solution().solution(
+            videoLen, pos, opStart, opEnd, commands
+        );
         sb.append(res).append('\n');
     }
 }
