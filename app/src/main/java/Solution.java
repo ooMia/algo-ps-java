@@ -1,51 +1,38 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 class Solution {
-    public int[] solution(int[] answers) {
-        int[] player1 = { 1, 2, 3, 4, 5 };
-        int[] player2 = { 2, 1, 2, 3, 2, 4, 2, 5 };
-        int[] player3 = { 3, 3, 1, 1, 2, 2, 4, 4, 5, 5 };
 
-        Data[] count = new Data[3];
-        for (int i = 0; i < count.length; i++) {
-            count[i] = new Data(i + 1);
-        }
-        for (int i = 0; i < answers.length; i++) {
-            if (player1[i % player1.length] == answers[i])
-                count[0].score++;
-            if (player2[i % player2.length] == answers[i])
-                count[1].score++;
-            if (player3[i % player3.length] == answers[i])
-                count[2].score++;
-        }
-        Arrays.sort(count);
+    // pair of integers which sum to the smallest absolute value
+    int[] res;
 
-        int maxScore = count[count.length - 1].score;
-        List<Integer> topPlayers = new ArrayList<>();
-        for (int i = 0; i < count.length; i++) {
-            if (count[i].score == maxScore) {
-                topPlayers.add(count[i].id);
+    public int[] solution(int[] numbers) {
+        int iFirst = 0, iLast = numbers.length - 1;
+        res = new int[] { numbers[iFirst], numbers[iLast] };
+
+        while (iFirst < iLast) {
+            int v1 = numbers[iFirst];
+            int v2 = numbers[iLast];
+            int sum = v1 + v2;
+
+            System.err.println("Updating result: " + v1 + " + " + v2 + " = " + sum);
+            if (sum == 0) {
+                res[0] = v1;
+                res[1] = v2;
+                return res;
+            } else {
+                int prevAbsSum = Math.abs(res[0] + res[1]);
+                int currentAbsSum = Math.abs(sum);
+                if (currentAbsSum < prevAbsSum) {
+                    res[0] = v1;
+                    res[1] = v2;
+                }
+            }
+
+            if (sum > 0) {
+                iLast--;
+            } else {
+                iFirst++;
             }
         }
-        return topPlayers.stream().mapToInt(i -> i).toArray();
+        return res;
     }
 
-    class Data implements Comparable<Data> {
-        int id;
-        int score = 0;
-
-        Data(int id) {
-            this.id = id;
-        }
-
-        @Override
-        public int compareTo(Data o) {
-            if (this.score == o.score) {
-                return Integer.compare(this.id, o.id);
-            }
-            return Integer.compare(this.score, o.score);
-        }
-    }
 }
