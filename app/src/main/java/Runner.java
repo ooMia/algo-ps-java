@@ -8,20 +8,17 @@ class Runner implements IRunner {
     final StringBuilder sb = new StringBuilder();
 
     final Solution solution = new Solution();
-    final int[] schedules;
-    final int[][] timelogs;
-    final int startday;
+    final String myString;
+    final String overwriteString;
+    final int s;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            schedules = reader.readInts();
-            timelogs = new int[schedules.length][];
-            for (int i = 0; i < schedules.length; i++) {
-                timelogs[i] = reader.readInts();
-            }
-            startday = reader.readInts()[0];
+            myString = reader.line();
+            overwriteString = reader.line();
+            s = Integer.parseInt(reader.line());
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -42,9 +39,9 @@ class Runner implements IRunner {
     @Override
     public void run() throws IOException {
         var res = new Solution().solution(
-                schedules,
-                timelogs,
-                startday);
+                myString,
+                overwriteString,
+                s);
         sb.append(res).append('\n');
     }
 }
