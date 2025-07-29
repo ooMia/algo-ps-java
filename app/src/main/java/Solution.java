@@ -1,38 +1,43 @@
+import java.util.Arrays;
+
 class Solution {
 
-    // pair of integers which sum to the smallest absolute value
-    int[] res;
+    public int solution(int nVertices, int nEdges, int[][] edges) {
+        Arrays.sort(edges, (e1, e2) -> Integer.compare(e1[2], e2[2]));
+        int[] parent = new int[nVertices + 1];
+        int nSelectedEdges = 0, totalWeight = 0;
 
-    public int[] solution(int[] numbers) {
-        int iFirst = 0, iLast = numbers.length - 1;
-        res = new int[] { numbers[iFirst], numbers[iLast] };
+        while (nSelectedEdges < nVertices - 1) {
+            for (int[] edge : edges) {
+                int u = edge[0];
+                int v = edge[1];
+                int weight = edge[2];
 
-        while (iFirst < iLast) {
-            int v1 = numbers[iFirst];
-            int v2 = numbers[iLast];
-            int sum = v1 + v2;
-
-            System.err.println("Updating result: " + v1 + " + " + v2 + " = " + sum);
-            if (sum == 0) {
-                res[0] = v1;
-                res[1] = v2;
-                return res;
-            } else {
-                int prevAbsSum = Math.abs(res[0] + res[1]);
-                int currentAbsSum = Math.abs(sum);
-                if (currentAbsSum < prevAbsSum) {
-                    res[0] = v1;
-                    res[1] = v2;
+                if (find(parent, u) != find(parent, v)) {
+                    union(parent, u, v);
+                    nSelectedEdges++;
+                    totalWeight += weight;
                 }
             }
-
-            if (sum > 0) {
-                iLast--;
-            } else {
-                iFirst++;
-            }
         }
-        return res;
+        return totalWeight;
     }
 
+    int find(int[] parent, int u) {
+        if (parent[u] == 0) {
+            return u;
+        }
+        if (parent[u] != u) {
+            parent[u] = find(parent, parent[u]);
+        }
+        return parent[u];
+    }
+
+    void union(int[] parent, int u, int v) {
+        int rootU = find(parent, u);
+        int rootV = find(parent, v);
+        if (rootU != rootV) {
+            parent[rootV] = rootU;
+        }
+    }
 }
