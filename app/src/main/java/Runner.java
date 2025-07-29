@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 class Runner implements IRunner {
     final IReader reader;
@@ -8,13 +9,13 @@ class Runner implements IRunner {
     final StringBuilder sb = new StringBuilder();
 
     final Solution solution = new Solution();
-    final int age;
+    final int[] emergency;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            age = reader.readInts()[0];
+            emergency = reader.readInts();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -34,8 +35,8 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(age);
-        sb.append(res).append('\n');
+        var res = new Solution().solution(emergency);
+        sb.append(Arrays.toString(res)).append('\n');
     }
 }
 
