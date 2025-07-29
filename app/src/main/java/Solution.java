@@ -1,95 +1,39 @@
 class Solution {
-    public int solution(int D, int[] cakes) {
-        // 닌자맛 쿠키는 표창 던지기의 명수입니다.
-        // 달리는 닌자맛 쿠키 앞을 막는 것은 용서하지 않죠.
+    public int solution(int n, int w, int num) {
+        int height = (n % w == 0) ? n / w : n / w + 1;
+        int[][] boxes = new int[height][w];
 
-        // 닌자맛 쿠키 앞에 K층의 케이크 들개들(장애물)이 가로막고 있습니다.
-        // 닌자맛 쿠키는 표창을 여러 개 던진 뒤, 1칸 앞으로 전진합니다.
-        // 닌자맛 쿠키가 던진 표창을 맞은 장애물은 높이가 1층 감소합니다.
-        // 또한, 표창은 장애물을 관통할 수 없습니다.
-        // 따라서 같은 높이의 장애물은 앞 장애물에 표창이 막혀 높이가 줄어들지 않습니다.
+        // fill boxes in zigzag manner
+        // start from the bottom left corner
+        int iFromX = 0, iFromY = height - 1;
+        boolean isDirRight = true;
+        int nBox = 1;
+        while (nBox <= n) {
+            boxes[iFromY][iFromX] = nBox++;
 
-        // 닌자맛 쿠키와 장애물 사이의 거리가 D칸이고,
-        // 장애물들의 높이가 정수 배열 cakes로 주어질 때,
-        // 닌자맛 쿠키가 모든 장애물을 없애고 통과할 수 있을까요?
-        // 통과할 수 있다면 총 몇 번 표창을 던져야 할까요?
-
-        // 예시
-        // D = 3, cakes = [2, 2, 3]
-        // D=3에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [1, 2, 2]로 줄어듦
-        // D=2에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [0, 1, 2]로 줄어듦
-        // D=1에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [0, 0, 1]로 줄어듦
-        // D=0에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [0, 0, 0]로 줄어듦
-        // 따라서, 장애물을 모두 없애고 통과할 수 있으며, 총 4번 표창을 던져야 합니다.
-        // 따라서, 3을 반환합니다.
-
-        // 예시
-        // D = 1, cakes = [2, 2, 3]
-        // D=1에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [1, 1, 2]로 줄어들지만
-        // D=0으로 전진할 때 장애물에 막혀 더 이상 달리지 못하게 된다.
-        // 따라서, 장애물을 모두 없애고 통과할 수 없으므로 -1을 반환합니다.
-
-        // 예시
-        // D = 2, cakes = [1, 2, 2]
-        // D=2에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [0, 1, 2]로 줄어듦
-        // D=1에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [0, 0, 1]로 줄어듦
-        // D=0에서 표창을 던져 장애물을 맞추고 장애물의 높이는 각 [0, 0, 0]로 줄어듦
-        // 따라서, 장애물을 모두 없애고 통과할 수 있으며, 총 3번 표창을 던져야 합니다.
-        // 따라서, 3을 반환합니다.
-
-        int n = cakes.length;
-        int answer = 0;
-
-        while (D-- > 0) {
-            if (throwShuriken(cakes))
-                answer++;
-        }
-
-        for (int i = 0; i < n; i++) {
-            if (cakes[i] > 0) {
-                // D가 0이 되었는데도 장애물이 남아있다면 통과할 수 없음
-                return -1;
-            }
-
-            if (throwShuriken(cakes)) {
-                answer++;
+            iFromX += isDirRight ? 1 : -1;
+            if (iFromX < 0 || iFromX >= w) {
+                isDirRight = !isDirRight;
+                --iFromY;
+                iFromX += isDirRight ? 1 : -1;
             }
         }
 
-        return answer;
-    }
-
-    private boolean throwShuriken(int[] arr) {
-        // 0을 제외한 가장 먼저 발견된 단조 증가 수열에 대해서만 -1씩 감소
-        // arr = [2, 2, 3] -> [1, 2, 2] return true
-        // arr = [1, 2, 2] -> [0, 1, 2] return true
-        // arr = [0, 1, 2] -> [0, 0, 1] return true
-        // arr = [3, 1, 2] -> [2, 1, 2] return true
-        // arr = [1, 2, 2] -> [0, 1, 2] return true
-        // arr = [0, 1, 2] -> [0, 0, 1] return true
-        // arr = [0, 0, 1] -> [0, 0, 0] return true
-        // arr = [0, 0, 0] -> [0, 0, 0] return false
-
-        int n = arr.length;
-        int idx = 0;
-        // 0이 아닌 첫 번째 인덱스 찾기
-        while (idx < n && arr[idx] == 0)
-            idx++;
-        if (idx == n)
-            return false; // 모두 0이면 더 이상 던질 필요 없음
-
-        // 단조 증가 구간만 -1씩 감소
-        int prev = arr[idx];
-        arr[idx]--;
-        for (int i = idx + 1; i < n; i++) {
-            if (arr[i] == 0)
-                break;
-            // 단조 증가가 아니면 중단
-            if (arr[i] < prev)
-                break;
-            prev = arr[i];
-            arr[i]--;
+        // find the box with the given number
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < w; ++x) {
+                if (boxes[y][x] == num) {
+                    int cnt = 0;
+                    while (y >= 0 && boxes[y][x] > 0) {
+                        ++cnt;
+                        --y;
+                    }
+                    return cnt;
+                }
+            }
         }
-        return true;
+
+        // if not found, return -1
+        return -1;
     }
 }
