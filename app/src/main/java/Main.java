@@ -11,9 +11,12 @@ public class Main {
         try {
             int T = 1;
             for (int i = 0; i < T; ++i) {
+                long start = System.currentTimeMillis();
                 IRunner runner = new Runner(br, bw);
                 runner.run();
                 runner.flush();
+                long end = System.currentTimeMillis();
+                System.err.println("case " + (i + 1) + ": " + (end - start) + " ms");
             }
             br.close();
             bw.close();
