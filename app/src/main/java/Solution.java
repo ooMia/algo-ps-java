@@ -1,72 +1,59 @@
+import java.util.Arrays;
+
 class Solution {
-    final int N, P;
 
-    Solution(int N, int P) {
-        this.N = N;
-        this.P = P;
-    }
+    // pair of integers which sum to the smallest absolute value
+    int[] res;
 
-    public int solution() {
-        if (P - N < N) {
-            // 윌슨의 정리 활용한 모듈러-팩토리얼 구하기
-            // 0 <= n < P, P는 소수
-            return factorialModP_Wilson(N, P);
-        } else {
-            // 기본 팩토리얼 방식 사용
-            return basicFactorial(N);
-        }
-    }
+    public int[] solution(int[] numbers) {
+        // init
+        int iFirst = 0, iLast = numbers.length - 1;
+        res = new int[] { numbers[iFirst], numbers[iLast], numbers[iLast - 1] };
 
-    int basicFactorial(int n) {
-        int res = 1;
-        for (int i = 1; i <= N; i++) {
-            res = modMul(res, i, P);
-        }
-        return res;
-    }
+        while (iFirst < iLast) {
+            int v1 = numbers[iFirst];
+            int v2 = numbers[iLast];
+            int sum = findLocalMinAbs(numbers, iFirst, iLast);
 
-    // (p-1)! = n! * (n+1) * ... * (p-1) ≡ -1 (mod p)
-    // n! = (p-1)! / ((n+1) * ... * (p-1)) % P
-    //
-    // - prod: (n+1) * (n+2) * ... * (P-1) % P
-    // - inv: prod^(-1) % P (페르마의 소정리)
-    // - res: -1 * inv % P (음수 처리)
-    int factorialModP_Wilson(int n, int p) {
-        int prod = 1;
-        for (int i = n + 1; i < p; i++) {
-            prod = modMul(prod, i, p);
-        }
-        int inv = modInverse(prod, p);
-        // -1 ≡ p - 1 (mod p)
-        // (-1 * inv) % p ≡ ((p - 1) * inv) % p
-        int res = modMul(p - 1, inv, p);
-        return res;
-    }
-
-    // 모듈러 곱셈: (a * b) % m
-    int modMul(int a, int b, int m) {
-        long res = a * b;
-        return (int) (res % m);
-    }
-
-    // 모듈러 역원: a^(-1) % m (m은 소수, 페르마의 소정리)
-    // a^(m-1) ≡ 1 (mod m)
-    // a^(m-2) ≡ a^(-1) (mod m)
-    int modInverse(int a, int m) {
-        return powMod(a, m - 2, m);
-    }
-
-    // 거듭제곱 모듈러: a^b % m
-    int powMod(int a, int b, int m) {
-        int result = 1;
-        a = a % m;
-        while (b > 0) {
-            if ((b & 1) == 1) { // b % 2 == 1
-                result = modMul(result, a, m);
+            int prevAbsSum = Math.abs(res[0] + res[1] + res[2]);
+            int currentAbsSum = Math.abs(sum);
+            if (currentAbsSum < prevAbsSum) {
+                res[0] = v1;
+                res[1] = v2;
+                res[2] = sum - v1 - v2;
+                if (currentAbsSum == 0) {
+                    break;
+                }
             }
-            a = modMul(a, a, m);
-            b >>= 1; // b /= 2
         }
-        return result;
+
+        Arrays.sort(res);
+        return res;
     }
+
+    int findLocalMinAbs(int[] numbers, int iFrom, int iEnd) {
+        // iFrom < iMid < iEnd
+        final int baseSum = numbers[iFrom++] + numbers[iEnd--];
+        int iMid, nextSum, prevSum = Integer.MAX_VALUE;
+
+        while (iFrom < iEnd) {
+            iMid = (iFrom + iEnd) / 2;
+            nextSum = baseSum + numbers[iMid];
+
+            if (nextSum < 0) {
+                iFrom = iMid + 1;
+            } else if (nextSum > 0) {
+                iEnd = iMid - 1;
+            } else {
+                return 0;
+            }
+
+            if (Math.abs(nextSum) < Math.abs(prevSum)) {
+                prevSum = nextSum;
+            }
+        }
+
+        return prevSum;
+    }
+
 }

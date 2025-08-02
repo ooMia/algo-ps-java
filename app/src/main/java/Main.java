@@ -9,14 +9,15 @@ public class Main {
         final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         try {
-            int T = 1;
+            int T = Integer.parseInt(br.readLine().trim());
             for (int i = 0; i < T; ++i) {
+                System.err.println("\ncase " + (i + 1));
                 long start = System.currentTimeMillis();
                 IRunner runner = new Runner(br, bw);
                 runner.run();
                 runner.flush();
                 long end = System.currentTimeMillis();
-                System.err.println("case " + (i + 1) + ": " + (end - start) + " ms");
+                System.err.println("took " + (end - start) + " ms");
             }
             br.close();
             bw.close();
