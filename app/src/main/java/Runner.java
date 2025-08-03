@@ -1,22 +1,19 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int[] numbers;
+    final String input;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            reader.skipLine();
-            numbers = reader.readInts();
-            Arrays.sort(numbers);
+            input = reader.line();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -36,11 +33,8 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(numbers);
-        Arrays.sort(res);
-        sb.append(res[0]).append(' ')
-                .append(res[1]).append(' ')
-                .append(res[2]).append('\n');
+        var res = new Solution(input).solve();
+        sb.append(res);
     }
 }
 
