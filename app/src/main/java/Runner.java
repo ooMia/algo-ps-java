@@ -7,16 +7,14 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, S; // N: 정수의 개수, S: 목표 합
+    final int N; // N: 정수의 개수
     final int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _ns = reader.readInts();
-            N = _ns[0];
-            S = _ns[1];
+            N = reader.readInts()[0];
             numbers = reader.readInts();
 
             sb.ensureCapacity(20);
@@ -37,7 +35,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(N, S, numbers).solve();
+        var res = new Solution(N, numbers).solve();
         sb.append(res).append('\n');
     }
 }
