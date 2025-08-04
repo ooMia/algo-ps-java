@@ -7,17 +7,17 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, C; // N: 아이템 개수, C: 최대 소지 무게
-    final int[] weights;
+    final int N, S; // N: 정수의 개수, S: 목표 합
+    final int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _nc = reader.readInts();
-            N = _nc[0];
-            C = _nc[1];
-            weights = reader.readInts();
+            var _ns = reader.readInts();
+            N = _ns[0];
+            S = _ns[1];
+            numbers = reader.readInts();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -37,7 +37,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(N, C, weights).solve();
+        var res = new Solution(N, S, numbers).solve();
         sb.append(res).append('\n');
     }
 }

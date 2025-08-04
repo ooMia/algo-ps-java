@@ -1,57 +1,51 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Solution {
 
-    final int N; // 전체 아이템 개수
-    final int C; // 최대 소지 무게
-    final int[] weights;
+    final int N; // 정수의 개수
+    final int S; // 목표 합
+    final int[] numbers;
 
-    Solution(int N, int C, int[] weights) {
+    Solution(int N, int S, int[] numbers) {
         this.N = N;
-        this.C = C;
-
-        List<Integer> _weights = new ArrayList<>(N);
-        for (int weight : weights) {
-            if (weight <= C) { // 최대 소지 무게보다 작거나 같은 아이템만 고려
-                _weights.add(weight);
-            }
-        }
-        this.weights = _weights.stream().mapToInt(i -> i).toArray();
+        this.S = S;
+        this.numbers = numbers;
     }
 
-    public int solve() {
-        int n = weights.length;
-        if (n <= 1) {
-            return n + 1; // 공집합 포함
+    public long solve() {
+        int n = numbers.length;
+        if (n <= 0) {
+            return 0;
         }
-        var sub1 = sumSubset(Arrays.copyOfRange(weights, 0, n / 2));
-        var sub2 = sumSubset(Arrays.copyOfRange(weights, n / 2, n));
+        if (n == 1) {
+            return numbers[0] == S ? 1 : 0;
+        }
 
-        Arrays.sort(sub2); // 이진 탐색을 위해 정렬
+        var sub1 = sumSubset(Arrays.copyOfRange(numbers, 0, n / 2));
+        var _sub2 = sumSubset(Arrays.copyOfRange(numbers, n / 2, n));
 
-        int count = 0;
+        Map<Long, Integer> sub2 = new HashMap<>();
+        for (long s2 : _sub2) {
+            sub2.put(s2, sub2.getOrDefault(s2, 0) + 1);
+        }
+
+        long count = 0;
+        System.err.println(Arrays.toString(sub1));
+        System.err.println(Arrays.toString(_sub2));
+        System.err.println(sub2.toString());
         for (var s1 : sub1) {
-            if (s1 > C)
-                continue;
-
-            int l = 0, r = sub2.length - 1;
-            while (l <= r) {
-                int mid = (l + r) / 2;
-                if (sub2[mid] + s1 > C) {
-                    r = mid - 1; // 합이 최대 소지 무게를 초과
-                } else {
-                    l = mid + 1; // 합이 최대 소지 무게 이하
-                }
-            }
-            count += r + 1; // sub2에서 s1과 합이 최대 소지 무게 이하인 경우의 수
+            count += sub2.getOrDefault(S - s1, 0);
+            System.err.println(count);
         }
 
-        if (sub1.length < 10 && sub2.length < 10) {
-            System.err.println("left: " + Arrays.toString(sub1));
-            System.err.println("right: " + Arrays.toString(sub2));
+        if (S == 0) {
+            count -= 1;
         }
+
         return count;
     }
 
@@ -61,9 +55,7 @@ class Solution {
 
         for (int mask = 0; mask <= (1 << n) - 1; ++mask) {
             long sum = sum(weights, mask);
-            if (sum <= C) { // 최대 소지 무게보다 작거나 같은 경우
-                sums.add(sum);
-            }
+            sums.add(sum);
         }
         return sums.stream().mapToLong(i -> i).toArray();
     }
