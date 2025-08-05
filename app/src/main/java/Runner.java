@@ -7,16 +7,14 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, S; // N: 수열의 길이, S: 부분 합 하한
+    final int N; // 수열의 길이
     final int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _ns = reader.readInts();
-            this.N = _ns[0];
-            this.S = _ns[1];
+            this.N = reader.readInts()[0];
             this.numbers = reader.readInts();
 
             sb.ensureCapacity(20);
@@ -37,8 +35,9 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(N, S, numbers).solve();
-        sb.append(res).append('\n');
+        var res = new Solution(N, numbers).solve();
+        sb.append(res[0]).append('\n');
+        sb.append(res[1]).append(" ").append(res[2]).append('\n');
     }
 }
 
