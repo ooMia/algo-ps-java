@@ -7,15 +7,15 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N; // N: 정수의 개수
-    final int[] numbers;
+    final int N, K; // N: 수빈이의 위치, K: 동생의 위치
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            N = reader.readInts()[0];
-            numbers = reader.readInts();
+            var _nk = reader.readInts();
+            this.N = _nk[0];
+            this.K = _nk[1];
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -35,7 +35,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(N, numbers).solve();
+        var res = new Solution(N, K).solve();
         sb.append(res).append('\n');
     }
 }
