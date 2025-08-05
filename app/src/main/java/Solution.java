@@ -1,70 +1,42 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
-
 class Solution {
 
-    final int N, K; // N: 수빈이의 위치, K: 동생의 위치
+    final int N, S; // N: 수열의 길이, S: 부분 합 하한
+    final int[] numbers;
 
-    Solution(int N, int K) {
+    Solution(int N, int S, int[] numbers) {
         this.N = N;
-        this.K = K;
+        this.S = S;
+        this.numbers = numbers;
     }
 
-    public long solve() {
-        PriorityQueue<History> pq = new PriorityQueue<>();
-        Map<Integer, Integer> visited = new HashMap<>();
-        pq.offer(new History(0, N));
-        visited.put(N, 0);
-
-        while (!pq.isEmpty()) {
-            History current = pq.poll();
-            int t = current.time;
-            int p = current.pos;
-
-            if (p == K) {
-                return t;
-            }
-
-            // 다음 위치를 큐에 추가
-            if (p - 1 >= 0) {
-                var key = p - 1;
-                if (!visited.containsKey(key) || visited.get(key) > t + 1) {
-                    pq.offer(new History(t + 1, key));
-                    visited.put(key, t + 1);
-                }
-            }
-
-            if (p + 1 <= 100000) {
-                var key = p + 1;
-                if (!visited.containsKey(key) || visited.get(key) > t + 1) {
-                    pq.offer(new History(t + 1, key));
-                    visited.put(key, t + 1);
-                }
-            }
-            if (p * 2 <= 100000) {
-                var key = p * 2;
-                if (!visited.containsKey(key) || visited.get(key) > t) {
-                    pq.offer(new History(t, key));
-                    visited.put(key, t);
-                }
-            }
-            System.err.println(pq.size());
-        }
-        return -1;
-    }
-
-    class History implements Comparable<History> {
-        final int time, pos;
-
-        History(int time, int pos) {
-            this.time = time;
-            this.pos = pos;
+    public int solve() {
+        int[] cumuls = new int[N + 1];
+        for (int i = 0; i < N; ++i) {
+            cumuls[i + 1] = cumuls[i] + numbers[i];
         }
 
-        @Override
-        public int compareTo(History o) {
-            return Integer.compare(this.time, o.time);
+        if (cumuls[N] < S) {
+            return 0; // 부분 합 하한을 만족하는 수열이 없음
+        }
+
+        int iSub = 0, iAdd = 0, res = Integer.MAX_VALUE;
+        while (true) {
+            int sum = cumuls[iAdd] - cumuls[iSub];
+            // System.err.println("iSub: " + iSub + ", iAdd: " + iAdd + ", sum: " + sum);
+            if (sum < S) {
+                ++iAdd;
+                if (iAdd > N) {
+                    return res == Integer.MAX_VALUE ? 0 : res;
+                }
+            }
+            else if (sum >= S) {
+                res = Math.min(res, iAdd - iSub);
+                ++iSub;
+                if (iSub > N) {
+                    return res;
+                }
+            }
         }
     }
+
 }
