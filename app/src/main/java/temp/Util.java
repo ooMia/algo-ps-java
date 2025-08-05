@@ -1,13 +1,9 @@
 package temp;
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class Util {
-    static List<Integer> range(int first, int last) {
-        List<Integer> result = new ArrayList<>();
-        for (int i = first; i <= last; ++i) {
-            result.add(i);
-        }
-        return result;
+    static int[] toIntArray(List<Integer> list) {
+        return list.stream().mapToInt(Integer::intValue).toArray();
     }
 }
