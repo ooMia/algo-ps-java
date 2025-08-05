@@ -7,15 +7,19 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int A, B;
+    final int N; // N: 펼쳐질 카드의 개수
+    final Card[] cards;
     
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _ab = reader.readInts();
-            this.A = _ab[0];
-            this.B = _ab[1];
+            this.N = reader.readInts()[0];
+            this.cards = new Card[N];
+            for (int i = 0; i < N; ++i) {
+                var _card = reader.line().split(" ");
+                this.cards[i] = new Card(_card[0], Integer.parseInt(_card[1]));
+            }
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -35,8 +39,8 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(A, B);
-        sb.append(res).append('\n');
+        var res = new Solution().solution(N, cards);
+        sb.append(res);
     }
 }
 
