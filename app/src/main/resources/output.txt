@@ -1,12 +1,1 @@
-1 NO
-2 YES
-3 NO
-4 NO
-5 NO
-4 NO
-3 YES
-1 NO
-12 YES
-11 NO
-12 YES
-1 NO
+<3, 6, 2, 7, 5, 1, 4>

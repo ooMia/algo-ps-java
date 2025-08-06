@@ -1,40 +1,25 @@
+import java.util.List;
+
 class Solution {
-    private int hour = 1; // [1, 12]
-    private int modifier = +1; // +1 or -1
 
-    final StringBuilder sb = new StringBuilder();
+    public String solution(int N, int K) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<");
 
-    public String solution(int N, Card[] cards) {
-        sb.ensureCapacity(20 * N);
-
-        for (int i = 0; i < N; ++i) {
-            var c = cards[i];
-            applyRules(c);
-            turnOver();
+        List<Integer> people = new java.util.LinkedList<>();
+        for (int j = 1; j <= N; j++) {
+            people.add(j);
         }
 
+        int i = 0;
+        while (people.size() > 0) {
+            i = (i + K - 1) % people.size();
+            sb.append(people.remove(i));
+            if (people.size() > 0) {
+                sb.append(", ");
+            }
+        }
+        sb.append(">");
         return sb.toString();
-    }
-
-    void applyRules(Card c) {
-        sb.append(hour).append(' ');
-
-        boolean needSync = false;
-        if (c.isHourglass && c.hour == hour) {
-            // 과부하의 원칙
-        } else if (c.isHourglass) {
-            // 시간 역행의 법칙
-            modifier *= -1;
-        } else if (c.hour == hour) {
-            // 동기화의 원칙
-            needSync = true;
-        }
-        sb.append(needSync ? "YES" : "NO").append('\n');
-    }
-
-    void turnOver() {
-        hour += modifier;
-        if (hour == 0) hour = 12;
-        else if (hour == 13) hour = 1;
     }
 }
