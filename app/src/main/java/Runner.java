@@ -7,15 +7,13 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, K; // N: 사람 수, K: k번째 사람을 제거
+    final int N; // N: number of rows
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _nk = reader.readInts();
-            this.N = _nk[0];
-            this.K = _nk[1];
+            this.N = reader.readInts()[0];
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -35,7 +33,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(N, K);
+        var res = new Solution().solution(N);
         sb.append(res);
     }
 }

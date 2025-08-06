@@ -1,25 +1,19 @@
-import java.util.List;
-
 class Solution {
 
-    public String solution(int N, int K) {
+    public String solution(int N) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<");
+        int row = 1;
 
-        List<Integer> people = new java.util.LinkedList<>();
-        for (int j = 1; j <= N; j++) {
-            people.add(j);
-        }
-
-        int i = 0;
-        while (people.size() > 0) {
-            i = (i + K - 1) % people.size();
-            sb.append(people.remove(i));
-            if (people.size() > 0) {
-                sb.append(", ");
+        while (row <= N) {
+            for (int b = 0; b < N - row; ++b) {
+                sb.append(" ");
             }
+            for (int s = 0; s < row * 2 - 1; ++s) {
+                sb.append("*");
+            }
+            sb.append("\n");
+            ++row;
         }
-        sb.append(">");
         return sb.toString();
     }
 }
