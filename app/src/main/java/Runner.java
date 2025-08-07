@@ -7,13 +7,23 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N; // N: number of rows
+    final int N, M; // N: nRows, M: nCols
+    final byte[][] grid;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.N = reader.readInts()[0];
+            var _nm = reader.readInts();
+            this.N = _nm[0];
+            this.M = _nm[1];
+            this.grid = new byte[N][M];
+            for (int i = 0; i < N; ++i) {
+                int j = 0;
+                for (int e: reader.readInts()) {
+                    grid[i][j++] = (byte) e;
+                }
+            }
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -33,8 +43,8 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(N);
-        sb.append(res);
+        var res = new Solution(N, M, grid).solution();
+        sb.append(res).append('\n');
     }
 }
 
