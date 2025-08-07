@@ -1,19 +1,20 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 class Runner implements IRunner {
     final IReader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String input;
+    final Stream<String> input;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.input = reader.line();
+            this.input = reader.lines();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {

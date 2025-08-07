@@ -1,15 +1,12 @@
+import java.util.stream.Stream;
+
 class Solution {
 
-    public String solution(String str) {
-        int[] charMap = new int['z' - 'a' + 1];
-        for (char c : str.toCharArray()) {
-            charMap[c - 'a']++;
-        }
+    public String solution(Stream<String> input) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < charMap.length; ++i) {
-            sb.append(charMap[i]).append(' ');
-        }
+        input.forEach(line -> {
+            sb.append(line).append('\n');
+        });
         return sb.toString();
     }
-
 }
