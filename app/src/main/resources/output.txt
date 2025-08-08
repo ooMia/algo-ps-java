@@ -1,5 +1,3 @@
-    Hello
-
-Baekjoon     
-   Online Judge    
-
+ccc 19
+aaa 16
+bbb 13
