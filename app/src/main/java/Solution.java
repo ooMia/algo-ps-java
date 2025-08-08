@@ -15,7 +15,7 @@ class Solution {
     void append(int row) {
         if (row == N) {
             // 2 * N - 1 stars
-            for (int j = 0; j < 2 * N - 1; ++j) {
+            for (int j = 0; j < 2 * N; ++j) {
                 sb.append("*");
             }
             sb.append("\n");
@@ -23,10 +23,13 @@ class Solution {
         }
 
         StringBuilder _sb = new StringBuilder();
-        for (int j = 0; j < N - row; ++j) {
+        for (int j = 0; j < row; ++j) {
+            _sb.append("*");
+        }
+        for (int j = 0; j < 2 * (N - row); ++j) {
             _sb.append(" ");
         }
-        for (int j = 0; j < 2 * row - 1; ++j) {
+        for (int j = 0; j < row; ++j) {
             _sb.append("*");
         }
         sb.append(_sb.toString()).append("\n");
