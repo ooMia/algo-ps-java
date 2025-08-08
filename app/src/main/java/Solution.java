@@ -1,24 +1,36 @@
 class Solution {
 
-    final int baseTime = 100;
-    final int baseFee = 10;
-    final int unitTime = 50;
-    final int unitFee = 3;
+    final int N; // N: nRows
+    StringBuilder sb = new StringBuilder();
 
-    public String solution(int N) {
-        StringBuilder sb = new StringBuilder();
+    Solution(int nRows) {
+        this.N = nRows;
+    }
 
-        for (int row = 1; row <= N; ++row) {
-            // 1. i blanks
-            for (int j = 0; j < row - 1; ++j) {
-                sb.append(" ");
-            }
-            // 2. 2(N-row) + 1 stars
-            for (int j = 0; j < 2 * (N - row) + 1; ++j) {
+    public String solution() {
+        append(1);
+        return sb.toString();
+    }
+
+    void append(int row) {
+        if (row == N) {
+            // 2 * N - 1 stars
+            for (int j = 0; j < 2 * N - 1; ++j) {
                 sb.append("*");
             }
             sb.append("\n");
+            return;
         }
-        return sb.toString();
+
+        StringBuilder _sb = new StringBuilder();
+        for (int j = 0; j < N - row; ++j) {
+            _sb.append(" ");
+        }
+        for (int j = 0; j < 2 * row - 1; ++j) {
+            _sb.append("*");
+        }
+        sb.append(_sb.toString()).append("\n");
+        append(row + 1);
+        sb.append(_sb.toString()).append("\n");
     }
 }

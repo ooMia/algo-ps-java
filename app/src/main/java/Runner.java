@@ -33,7 +33,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(N);
+        var res = new Solution(N).solution();
         sb.append(res);
     }
 }
