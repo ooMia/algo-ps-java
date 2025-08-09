@@ -1,39 +1,56 @@
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Queue;
+
 class Solution {
 
-    final int N; // N: nRows
-    StringBuilder sb = new StringBuilder();
+    final int nRows;
+    final char[][] baseStar = {
+            { ' ', ' ', '*', ' ', ' ' },
+            { ' ', '*', ' ', '*', ' ' },
+            { '*', '*', '*', '*', '*' },
+    };
+    final char[][] stars;
+    final StringBuilder sb = new StringBuilder();
 
     Solution(int nRows) {
-        this.N = nRows;
+        this.nRows = nRows;
+        this.stars = new char[nRows][2 * nRows - 1];
+        for (int i = 0; i < nRows; ++i) {
+            Arrays.fill(stars[i], ' ');
+        }
     }
 
-    public String solution() {
-        append(1);
+    public String solution(int n) {
+        Queue<Point> queue = new ArrayDeque<>();
+        queue.add(new Point(0, (stars[0].length + 1) / 2));
+
+        while (queue.size() > 0) {
+            Point p = queue.poll();
+            draw(p.y, p.x, 0);
+        }
+
+        for (int i = 0; i < nRows; ++i) {
+            sb.append(stars[i]);
+            sb.append('\n');
+        }
         return sb.toString();
     }
 
-    void append(int row) {
-        if (row == N) {
-            // 2 * N - 1 stars
-            for (int j = 0; j < 2 * N; ++j) {
-                sb.append("*");
-            }
-            sb.append("\n");
-            return;
+    void draw(int y, int x, int level) {
+        if (level <= 1) {
+            
         }
 
-        StringBuilder _sb = new StringBuilder();
-        for (int j = 0; j < row; ++j) {
-            _sb.append("*");
-        }
-        for (int j = 0; j < 2 * (N - row); ++j) {
-            _sb.append(" ");
-        }
-        for (int j = 0; j < row; ++j) {
-            _sb.append("*");
-        }
-        sb.append(_sb.toString()).append("\n");
-        append(row + 1);
-        sb.append(_sb.toString()).append("\n");
     }
+
+    class Point {
+        int y, x;
+
+        Point(int y, int x) {
+            this.y = y;
+            this.x = x;
+        }
+    }
+
 }
