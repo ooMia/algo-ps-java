@@ -1,56 +1,21 @@
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Queue;
-
 class Solution {
 
-    final int nRows;
-    final char[][] baseStar = {
-            { ' ', ' ', '*', ' ', ' ' },
-            { ' ', '*', ' ', '*', ' ' },
-            { '*', '*', '*', '*', '*' },
-    };
-    final char[][] stars;
-    final StringBuilder sb = new StringBuilder();
+    final int MOD = 10007;
+    final int nCols;
+    final int[] dp;
 
-    Solution(int nRows) {
-        this.nRows = nRows;
-        this.stars = new char[nRows][2 * nRows - 1];
-        for (int i = 0; i < nRows; ++i) {
-            Arrays.fill(stars[i], ' ');
-        }
+    Solution(int nCols) {
+        this.nCols = nCols;
+        this.dp = new int[nCols + 3];
+        dp[0] = 0;
+        dp[1] = 1;
+        dp[2] = 2;
     }
 
-    public String solution(int n) {
-        Queue<Point> queue = new ArrayDeque<>();
-        queue.add(new Point(0, (stars[0].length + 1) / 2));
-
-        while (queue.size() > 0) {
-            Point p = queue.poll();
-            draw(p.y, p.x, 0);
+    public int solution() {
+        for (int i = 3; i <= nCols; ++i) {
+            dp[i] = (dp[i - 1] + dp[i - 2]) % MOD;
         }
-
-        for (int i = 0; i < nRows; ++i) {
-            sb.append(stars[i]);
-            sb.append('\n');
-        }
-        return sb.toString();
+        return dp[nCols];
     }
-
-    void draw(int y, int x, int level) {
-        if (level <= 1) {
-            
-        }
-
-    }
-
-    class Point {
-        int y, x;
-
-        Point(int y, int x) {
-            this.y = y;
-            this.x = x;
-        }
-    }
-
 }

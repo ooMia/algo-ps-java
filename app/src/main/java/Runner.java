@@ -7,7 +7,7 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N; // N: nRows
+    final int N; // N: nCols
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
@@ -33,8 +33,8 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(N).solution(N);
-        sb.append(res);
+        var res = new Solution(N).solution();
+        sb.append(res).append('\n');
     }
 }
 
