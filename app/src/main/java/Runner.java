@@ -7,20 +7,13 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N;
-    final String[] names;
-    final String[][] likes;
+    final String input;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.N = reader.readInts()[0];
-            this.names = reader.line().split(" ");
-            this.likes = new String[N][];
-            for (int i = 0; i < N; ++i) {
-                likes[i] = reader.line().split(" ");
-            }
+            this.input = reader.line();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -40,7 +33,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(N, names, likes).solution();
+        var res = new Solution().solution(input);
         sb.append(res).append('\n');
     }
 }

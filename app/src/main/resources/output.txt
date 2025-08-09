@@ -1,10 +1,2 @@
-aaa 3
-bbb 2
-ddd 2
-ccc 0
-
-ddd 3
-bbb 2
-aaa 1
-ccc 1
-
+123456789
+14067
