@@ -7,23 +7,20 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int nRows, nCols;
-    final int[][] numbers;
-
-    final int K;
+    final int N;
+    final String[] names;
+    final String[][] likes;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var input = reader.readInts();
-            nRows = input[0];
-            nCols = input[1];
-            numbers = new int[nRows][];
-            for (int r = 0; r < nRows; r++) {
-                numbers[r] = reader.readInts();
+            this.N = reader.readInts()[0];
+            this.names = reader.line().split(" ");
+            this.likes = new String[N][];
+            for (int i = 0; i < N; ++i) {
+                likes[i] = reader.line().split(" ");
             }
-            K = reader.readInts()[0];
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -43,12 +40,8 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var sol = new Solution(nRows, nCols, numbers);
-        for (int k = 0; k < K; ++k) {
-            var xy = reader.readInts();
-            var res = sol.solution(xy[0], xy[1], xy[2], xy[3]);
-            sb.append(res).append('\n');
-        }
+        var res = new Solution(N, names, likes).solution();
+        sb.append(res).append('\n');
     }
 }
 
