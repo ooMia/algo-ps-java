@@ -1,32 +1,22 @@
 class Solution {
 
-    final int[] numbers;
+    final int nRows, nCols;
+    final int[][] cumuls;
 
-    Solution(int[] numbers) {
-        this.numbers = numbers;
+    Solution(int nRows, int nCols, int[][] numbers) {
+        this.nRows = nRows;
+        this.nCols = nCols;
+        this.cumuls = new int[nRows + 1][nCols + 1];
+
+        for (int r = 1; r <= nRows; ++r) {
+            for (int c = 1; c <= nCols; ++c) {
+                cumuls[r][c] = cumuls[r - 1][c] + cumuls[r][c - 1] + numbers[r - 1][c - 1] - cumuls[r - 1][c - 1];
+            }
+        }
     }
 
-    public int solution() {
-        int N = numbers.length;
-        int[] cumuls = new int[N + 1]; // sigma [0, k)
-        for (int i = 1; i <= N; i++) {
-            cumuls[i] = cumuls[i - 1] + numbers[i - 1];
-        }
-
-        int res = cumuls[0];
-        for (int i = N; i > 0; --i) {
-            int sum = cumuls[i];
-            if (sum == 100)
-                return sum;
-
-            int abs = Math.abs(100 - sum);
-            int resAbs = Math.abs(100 - res);
-            if (abs == resAbs)
-                res = Math.max(res, sum);
-            else if (abs < resAbs)
-                res = sum;
-        }
-
-        return res;
+    public int solution(int y1, int x1, int y2, int x2) {
+        // sD(y2, x2) - sC(y1-1, x2) - sB(y2, x1-1) + sA(y1-1, x1-1)
+        return cumuls[y2][x2] - cumuls[y1 - 1][x2] - cumuls[y2][x1 - 1] + cumuls[y1 - 1][x1 - 1];
     }
 }
