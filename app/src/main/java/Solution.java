@@ -1,14 +1,14 @@
 class Solution {
 
-    public long solution(String numbers) {
+    private final int N, M;
 
-        String[] numbers_arr = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-
-        for (int i = 0; i < numbers_arr.length; ++i) {
-            numbers = numbers.replace(numbers_arr[i], String.valueOf(i));
-        }
-
-        long answer = Long.parseLong(numbers);
-        return answer;
+    Solution(int N, int M) {
+        this.N = N;
+        this.M = M;
     }
+
+    public String solution() {
+        return 100 * N >= M ? "Yes" : "No";
+    }
+
 }
