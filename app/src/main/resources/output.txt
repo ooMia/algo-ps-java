@@ -1,5 +1,2 @@
-config????
-conte?t.txt
-c.user.?i?e.programs
-?
-onlyonefile
+mirkovniz
+FRULA

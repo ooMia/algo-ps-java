@@ -1,21 +1,44 @@
 class Solution {
 
-    final String[] lines;
+    final String target, replacement;
 
-    Solution(String[] lines) {
-        this.lines = lines;
+    final char[] buffer;
+    int iBuffer = -1;
+
+    Solution(String target, String replacement) {
+        this.target = target;
+        this.replacement = replacement;
+        this.buffer = new char[target.length()];
     }
 
     public String solution() {
-        char[] res = lines[0].toCharArray();
-        for (int i = 1; i < lines.length; ++i) {
-            char[] next = lines[i].toCharArray();
-            for (int j = 0; j < res.length; ++j) {
-                if (res[j] != next[j])
-                    res[j] = '?';
-            }
+        var lenRepl = replacement.length();
+        var lastChar = replacement.charAt(lenRepl - 1);
+        for (char c : target.toCharArray()) {
+            buffer[++iBuffer] = c;
+            if (c == lastChar && check())
+                iBuffer -= lenRepl;
         }
-        return new String(res);
+
+        if (iBuffer < 0) {
+            return "FRULA";
+        }
+        return new String(buffer, 0, iBuffer + 1);
+    }
+
+    boolean check() {
+        var N = replacement.length();
+        for (int i = 0; i < N; ++i) {
+            var j = iBuffer + 1 - N + i;
+            if (j < 0)
+                return false;
+
+            var c1 = replacement.charAt(i);
+            var c2 = buffer[j];
+            if (c1 != c2)
+                return false;
+        }
+        return true;
     }
 
 }
