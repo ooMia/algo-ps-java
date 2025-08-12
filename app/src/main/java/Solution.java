@@ -1,12 +1,18 @@
+import java.util.Set;
+import java.util.TreeSet;
+
 class Solution {
 
-    public String solution(String[] words) {
-        StringBuilder sb = new StringBuilder();
-
-        for (String s : words) {
-            StringBuilder word = new StringBuilder(s);
-            sb.append(word.reverse().toString()).append(" ");
+    public String solution(String word) {
+        Set<String> suffs = new TreeSet<>();
+        for (int i = 0; i < word.length(); ++i) {
+            suffs.add(word.substring(i));
         }
-        return sb.substring(0, sb.length() - 1);
+
+        StringBuilder sb = new StringBuilder();
+        for (String s : suffs) {
+            sb.append(s).append("\n");
+        }
+        return sb.toString();
     }
 }
