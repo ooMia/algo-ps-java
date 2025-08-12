@@ -7,13 +7,17 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String[] tokens;
+    final String[] lines;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.tokens = reader.line().split("(?=[+-])");
+            var N = reader.readInts()[0];
+            this.lines = new String[N];
+            for (int i = 0; i < N; ++i) {
+                lines[i] = reader.line();
+            }
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -33,7 +37,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(tokens).solution();
+        var res = new Solution(lines).solution();
         sb.append(res).append('\n');
     }
 }
