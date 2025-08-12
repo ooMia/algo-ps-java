@@ -1,20 +1,12 @@
-import java.util.Arrays;
-
 class Solution {
 
-    public String solution(char[] numbers) {
-        Arrays.sort(numbers);
-        if (numbers[0] != '0')
-            return "-1";
-
+    public String solution(String[] words) {
         StringBuilder sb = new StringBuilder();
-        int sum = 0;
-        for (int i=numbers.length-1; i>=0; --i) {
-            var c = numbers[i];
-            sum += c - '0';
-            sb.append(c);
-        }
 
-        return sum % 3 == 0 ? sb.toString() : "-1";
+        for (String s : words) {
+            StringBuilder word = new StringBuilder(s);
+            sb.append(word.reverse().toString()).append(" ");
+        }
+        return sb.substring(0, sb.length() - 1);
     }
 }
