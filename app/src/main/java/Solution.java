@@ -1,31 +1,34 @@
-import java.util.Arrays;
-
 class Solution {
 
-    final int[][] times;
+    final String[] tokens;
 
-    Solution(int[][] times) {
-        this.times = times;
+    Solution(String[] tokens) {
+        this.tokens = tokens;
     }
 
     public int solution() {
-        Arrays.sort(times, (a, b) -> {
-            if (a[1] == b[1]) {
-                return Integer.compare(a[0], b[0]);
+        int res = Integer.parseInt(tokens[0]);
+        for (int i = 1; i < tokens.length;) {
+            int sub = 0;
+            {
+                int n = Integer.parseInt(tokens[i++]);
+                if (n > 0) {
+                    res += n;
+                    continue;
+                }
+                sub = n;
             }
-            return Integer.compare(a[1], b[1]);
-        });
 
-        int t = 0, count = 0;
-        for (int[] time : times) {
-            System.err.println("t: " + t + ", time: " + Arrays.toString(time));
-            if (t <= time[0]) {
-                t = time[1];
-                ++count;
+            while (i < tokens.length) {
+                int m = Integer.parseInt(tokens[i]);
+                if (m < 0)
+                    break;
+                sub -= m;
+                ++i;
             }
+            res += sub;
         }
-
-        return count;
+        return res;
     }
 
 }
