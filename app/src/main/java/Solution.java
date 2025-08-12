@@ -1,14 +1,11 @@
 class Solution {
 
-    private final int N, M;
-
-    Solution(int N, int M) {
-        this.N = N;
-        this.M = M;
-    }
-
-    public String solution() {
-        return 100 * N >= M ? "Yes" : "No";
+    public String solution(String[] ls) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ls.length; ++i) {
+            sb.append(i + 1).append(". ").append(ls[i]).append('\n');
+        }
+        return sb.toString();
     }
 
 }

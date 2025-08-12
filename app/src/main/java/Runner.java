@@ -7,15 +7,14 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, M; // N: number of 100 coins, M: price of item
+    final String[] ls;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var input = reader.readInts();
-            this.N = input[0];
-            this.M = input[1];
+            reader.skipLine();
+            ls = reader.lines().toArray(String[]::new);
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -35,7 +34,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(N, M).solution();
+        var res = new Solution().solution(ls);
         sb.append(res).append('\n');
     }
 }
