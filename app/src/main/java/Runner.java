@@ -7,14 +7,15 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String target, replacement;
+    final char[][] grid = new char[8][];
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.target = reader.line();
-            this.replacement = reader.line();
+            for (int i = 0; i < 8; i++) {
+                grid[i] = reader.line().toCharArray();
+            }
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -34,7 +35,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution(target, replacement).solution();
+        var res = new Solution().solution(grid);
         sb.append(res).append('\n');
     }
 }
