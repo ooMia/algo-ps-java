@@ -1,18 +1,23 @@
 class Solution {
 
-    public int solution(char[][] grid) {
-        int count = 0;
-        for (int y = 0; y < 8; ++y) {
-            for (int x = 0; x < 8; ++x) {
-                if (grid[y][x] == 'F')
-                    count += isWhite(y, x) ? 1 : 0;
-            }
+    public int solution(char[] binary) {
+        char prev = binary[0];
+        int i = 1;
+
+        int set0 = (prev == '0') ? 1 : 0;
+        int set1 = (prev == '1') ? 1 : 0;
+
+        while (i < binary.length) {
+            var c = binary[i++];
+            if (c == prev)
+                continue;
+
+            if (c == '0')
+                set0++;
+            else
+                set1++;
+            prev = c;
         }
-        return count;
+        return Math.min(set0, set1);
     }
-
-    boolean isWhite(int y, int x) {
-        return ((y + x) & 1) == 0;
-    }
-
 }
