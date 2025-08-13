@@ -7,13 +7,13 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String octal;
+    final int[] heights;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.octal = reader.line();
+            this.heights = reader.lines().mapToInt(Integer::parseInt).toArray();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -33,7 +33,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(octal);
+        var res = new Solution().solution(heights);
         sb.append(res).append('\n');
     }
 }
