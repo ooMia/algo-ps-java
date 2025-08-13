@@ -1,82 +1,71 @@
-import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
 
 class Solution {
 
+    final int nRows, nCols;
     final char[][] grid;
+    final boolean[][] visited;
+    final int[][] dist;
 
-    Solution(char[][] grid) {
+    final PriorityQueue<Point> queue = new PriorityQueue<>(
+            (o1, o2) -> Integer.compare(o1.dist, o2.dist));
+
+    Solution(int nRows, int nCols, char[][] grid, int rDest, int cDest) {
+        this.nRows = nRows;
+        this.nCols = nCols;
         this.grid = grid;
+        this.visited = new boolean[nRows][nCols];
+        this.dist = new int[nRows][nCols];
+
+        queue.add(new Point(rDest, cDest, 0));
+        visited[rDest][cDest] = true;
     }
 
     public String solution() {
-        PriorityQueue<Paper> queue = new PriorityQueue<>();
-        queue.add(new Paper(0, 0, grid.length));
-
-        int nWhite = 0, nBlue = 0;
         while (!queue.isEmpty()) {
-            Paper paper = queue.poll();
-            int color = paper.color();
+            var p = queue.poll();
+            dist[p.y][p.x] = p.dist;
 
-            if (color == -1) { // mixed
-                if (paper.size == 2) {
-                    int Y = paper.minY, X = paper.minX;
-                    for (int y = Y; y < Y + 2; ++y) {
-                        for (int x = X; x < X + 2; ++x) {
-                            if (grid[y][x] == '0') {
-                                ++nWhite;
-                            } else {
-                                ++nBlue;
-                            }
-                        }
-                    }
-                } else
-                    queue.addAll(paper.split());
-            } else if (color == 0) {
-                ++nWhite;
-            } else if (color == 1) {
-                ++nBlue;
-            }
-        }
-        return String.format("%d\n%d", nWhite, nBlue);
-    }
-
-    class Paper implements Comparable<Paper> {
-        final int minY, maxY, minX, maxX, size;
-
-        Paper(int minY, int minX, int size) {
-            this.minY = minY;
-            this.minX = minX;
-            this.size = size;
-            this.maxY = minY + size - 1;
-            this.maxX = minX + size - 1;
-        }
-
-        int color() {
-            // -1: mixed, 0: white, 1: blue
-            char base = grid[minY][minX];
-            for (int y = minY; y <= maxY; ++y) {
-                for (int x = minX; x <= maxX; ++x) {
-                    if (grid[y][x] != base)
-                        return -1; // mixed
+            var nexts = List.of(
+                    new Point(p.y, p.x - 1, p.dist + 1), // left
+                    new Point(p.y, p.x + 1, p.dist + 1), // right
+                    new Point(p.y - 1, p.x, p.dist + 1), // down
+                    new Point(p.y + 1, p.x, p.dist + 1)  // up
+            );
+            for (var next : nexts) {
+                int Y = next.y, X = next.x;
+                if (isValidPos(Y, X) && visited[Y][X] == false && grid[Y][X] == '1') {
+                    visited[Y][X] = true;
+                    queue.add(next);
                 }
             }
-            return base - '0';
+
         }
 
-        Collection<Paper> split() {
-            int half = size / 2;
-            return List.of(
-                    new Paper(minY, minX, half),
-                    new Paper(minY, minX + half, half),
-                    new Paper(minY + half, minX, half),
-                    new Paper(minY + half, minX + half, half));
+        StringBuilder sb = new StringBuilder();
+        for (int row = 0; row < nRows; ++row) {
+            for (int col = 0; col < nCols; ++col) {
+                int d = (grid[row][col] == '1' && dist[row][col] == 0) ? -1 : dist[row][col];
+                sb.append(d).append(' ');
+            }
+            sb.append('\n');
         }
+        return sb.toString();
+    }
 
-        @Override
-        public int compareTo(Solution.Paper o) {
-            return Integer.compare(this.size, o.size);
+    boolean isValidPos(int y, int x) {
+        return 0 <= y && y < nRows && 0 <= x && x < nCols;
+    }
+
+    class Point {
+        final int y, x, dist;
+
+        Point(int y, int x, int dist) {
+            this.y = y;
+            this.x = x;
+            this.dist = dist;
         }
     }
+
 }
