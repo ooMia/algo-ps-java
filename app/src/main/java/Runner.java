@@ -7,13 +7,17 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int[] heights;
+    final int N, M;
+    final int[] woods;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.heights = reader.lines().mapToInt(Integer::parseInt).toArray();
+            var _nm = reader.readInts();
+            this.N = _nm[0];
+            this.M = _nm[1];
+            this.woods = reader.readInts();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -33,7 +37,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(heights);
+        var res = new Solution(N, M, woods).solution();
         sb.append(res).append('\n');
     }
 }
