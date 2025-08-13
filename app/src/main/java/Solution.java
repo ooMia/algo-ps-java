@@ -1,34 +1,30 @@
 class Solution {
-    public String solution(String polynomial) {
-        var tokens = polynomial.split(" ");
-
-        int[] coefs = new int[2];
-        for (var token : tokens) {
-            if ("+".equals(token))
-                continue;
-
-            var N = token.length();
-            if ('x' == token.charAt(N - 1)) {
-                if (N == 1) {
-                    ++coefs[1];
-                    continue;
-                }
-                var s = token.substring(0, N - 1);
-                coefs[1] += Integer.parseInt(s);
-            }
-            else
-                coefs[0] += Integer.parseInt(token);
+    public String solution(String octal) {
+        if ("0".equals(octal)) {
+            return "0";
         }
+        
+        StringBuilder binary = new StringBuilder();
+        for (char c: octal.toCharArray()){
+            binary.append(octalToBinary(c));
+        }
+        
+        int iStart = 0;
+        while(binary.charAt(iStart) == '0') iStart++;
+        return binary.substring(iStart);
+    }
 
-        StringBuilder sb = new StringBuilder();
-        if (coefs[1] == 1)
-            sb.append("x");
-        else if (coefs[1] > 1)
-            sb.append(coefs[1]).append("x");
-        if (coefs[0] > 0 && coefs[1] > 0)
-            sb.append(" + ");
-        if (coefs[0] > 0)
-            sb.append(coefs[0]);
-        return sb.toString();
+    String octalToBinary(char c) {
+        switch (c) {
+            case '0': return "000";
+            case '1': return "001";
+            case '2': return "010";
+            case '3': return "011";
+            case '4': return "100";
+            case '5': return "101";
+            case '6': return "110";
+            case '7': return "111";
+            default: return "";
+        }
     }
 }

@@ -7,13 +7,13 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String polynomial;
+    final String octal;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.polynomial = reader.line();
+            this.octal = reader.line();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -33,7 +33,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var res = new Solution().solution(polynomial);
+        var res = new Solution().solution(octal);
         sb.append(res).append('\n');
     }
 }
