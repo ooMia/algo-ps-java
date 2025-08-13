@@ -1,17 +1,21 @@
 class Solution {
-    public String solution(String s) {
-        char[] arr = new char[s.length()];
-        for (int i = 0; i < s.length(); ++i) {
-            arr[i] = ROT13(s.charAt(i));
+    public String solution(String lines[]) {
+        StringBuilder sb = new StringBuilder();
+        for (String line : lines) {
+            if ("#".equals(line)) {
+                break;
+            }
+            sb.append(countVowels(line)).append('\n');
         }
-        return new String(arr);
+        return sb.toString();
     }
 
-    char ROT13(char c) {
-        if (Character.isDigit(c) || c == ' ') {
-            return c;
+    int countVowels(String s) {
+        int count = 0;
+        for (char c : s.toCharArray()) {
+            if ("aeiouAEIOU".indexOf(c) >= 0)
+                ++count;
         }
-        int base = Character.isLowerCase(c) ? 'a' : 'A';
-        return (char) ((c - base + 13) % 26 + base);
+        return count;
     }
 }

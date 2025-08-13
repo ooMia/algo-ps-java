@@ -1,5 +1,5 @@
-4
-Baekjoon Online Judge
-Onrxwbba Bayvar Whqtr
-One is 1
-Bar vf 1
+1
+How are you today?
+Quite well, thank you, how about yourself?
+I live at number twenty four.
+#
