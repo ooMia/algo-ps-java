@@ -7,13 +7,13 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int n;
+    final long n;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.n = reader.readInts()[0];
+            this.n = Long.parseLong(reader.line());
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
