@@ -7,29 +7,16 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int nRows, nCols;
-    int rDest, cDest;
-    final char[][] grid;
+    final int N, r, c;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var rc = reader.readInts();
-            this.nRows = rc[0];
-            this.nCols = rc[1];
-            this.grid = new char[nRows][nCols];
-            for (int row = 0; row < nRows; ++row) {
-                var s = reader.line();
-                for (int i = 0, col = 0; i < s.length(); i += 2) {
-                    var c = s.charAt(i);
-                    if (c == '2') {
-                        this.rDest = row;
-                        this.cDest = col;
-                    }
-                    this.grid[row][col++] = c;
-                }
-            }
+            var nrc = reader.readInts();
+            this.N = nrc[0];
+            this.r = nrc[1];
+            this.c = nrc[2];
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -49,7 +36,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var sol = new Solution(nRows, nCols, grid, rDest, cDest);
+        var sol = new Solution(N, r, c);
         var res = sol.solution();
         sb.append(res).append('\n');
     }
