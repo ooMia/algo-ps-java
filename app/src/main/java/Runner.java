@@ -8,17 +8,16 @@ class Runner implements IRunner {
     final StringBuilder sb = new StringBuilder();
 
     final int N;
-    final int[][] lines;
+    final int[] numbers;
+    final int M;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
             this.N = reader.readInts()[0];
-            lines = new int[N][];
-            for (int i = 0; i < N; ++i) {
-                lines[i] = reader.readInts();
-            }
+            numbers = reader.readInts();
+            this.M = reader.readInts()[0];
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -38,9 +37,12 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var sol = new Solution();
-        var res = sol.solution(N, lines);
-        sb.append(res).append('\n');
+        var sol = new Solution(N, numbers);
+        for (int m = 0; m < M; m++) {
+            var input = reader.readInts();
+            var res = sol.solution(input[0] - 1, input[1] - 1);
+            sb.append(res).append('\n');
+        }
     }
 }
 
