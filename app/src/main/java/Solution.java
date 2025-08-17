@@ -1,33 +1,44 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 
 class Solution {
-    final int N;
-    final int[] numbers;
+    final int C; // C: promotion goal
+    final int N; // N: number of promotions
+    final int[][] promotions; // [0]: cost, [1]: benefit
+    final int maxBenefit;
 
-    public Solution(int N, int[] number) {
+    public Solution(int C, int N, int[][] promotions) {
+        this.C = C;
         this.N = N;
-        this.numbers = number;
+        this.promotions = promotions;
+        int benefit = Integer.MIN_VALUE;
+        for (var p : promotions) {
+            benefit = Math.max(benefit, p[1]);
+        }
+        this.maxBenefit = benefit;
     }
 
     public int solution() {
-        List<Integer> res = new ArrayList<>();
+        int limit = C + maxBenefit;
+        int[] dp = new int[limit + 1];
+        Arrays.fill(dp, Integer.MAX_VALUE);
+        dp[0] = 0;
 
-        for (var n : numbers) {
-            int idx = findPos(res, n);
-            if (idx == res.size()) {
-                res.add(n);
-            } else {
-                res.set(idx, n);
+        for (var p : promotions) {
+            System.err.println(Arrays.toString(p));
+            var cost = p[0];
+            var benefit = p[1];
+            for (int i = benefit; i <= limit; ++i) {
+                if (dp[i - benefit] != Integer.MAX_VALUE) {
+                    dp[i] = Math.min(dp[i], dp[i - benefit] + cost);
+                }
             }
         }
-        return res.size();
-    }
 
-    int findPos(List<Integer> list, int target) {
-        // idx는 동일한 요소가 없는 경우, 자신보다 큰 요소가 처음으로 나오는 위치를 반환함
-        var idx = Collections.binarySearch(list, target);
-        return idx < 0 ? -(idx + 1) : idx;
+        // [C, limit] 구간 내 최소 비용 반환
+        int res = Integer.MAX_VALUE;
+        for (int i = C; i <= limit; ++i) {
+            res = Math.min(res, dp[i]);
+        }
+        return res == Integer.MAX_VALUE ? -1 : res;
     }
 }

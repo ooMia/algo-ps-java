@@ -7,15 +7,20 @@ class Runner implements IRunner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N;
-    final int[] numbers;
+    final int C, N; // C: promotion goal
+    final int[][] promotions; // [0]: cost, [1]: benefit
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.N = reader.readInts()[0];
-            this.numbers = reader.readInts();
+            var input = reader.readInts();
+            this.C = input[0];
+            this.N = input[1];
+            this.promotions = new int[N][];
+            for (int i = 0; i < N; ++i) {
+                this.promotions[i] = reader.readInts();
+            }
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -35,7 +40,7 @@ class Runner implements IRunner {
 
     @Override
     public void run() throws IOException {
-        var sol = new Solution(N, numbers);
+        var sol = new Solution(C, N, promotions);
         var res = sol.solution();
         sb.append(res).append('\n');
     }
