@@ -1,44 +1,57 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
 
 class Solution {
-    final int C; // C: promotion goal
-    final int N; // N: number of promotions
-    final int[][] promotions; // [0]: cost, [1]: benefit
-    final int maxBenefit;
+    final int N;
+    final int[] numbers;
 
-    public Solution(int C, int N, int[][] promotions) {
-        this.C = C;
+    public Solution(int N, int[] number) {
         this.N = N;
-        this.promotions = promotions;
-        int benefit = Integer.MIN_VALUE;
-        for (var p : promotions) {
-            benefit = Math.max(benefit, p[1]);
-        }
-        this.maxBenefit = benefit;
+        this.numbers = number;
     }
 
-    public int solution() {
-        int limit = C + maxBenefit;
-        int[] dp = new int[limit + 1];
-        Arrays.fill(dp, Integer.MAX_VALUE);
-        dp[0] = 0;
+    public String solution() {
+        List<Integer> res = new ArrayList<>();
+        List<Integer> index = new ArrayList<>();
 
-        for (var p : promotions) {
-            System.err.println(Arrays.toString(p));
-            var cost = p[0];
-            var benefit = p[1];
-            for (int i = benefit; i <= limit; ++i) {
-                if (dp[i - benefit] != Integer.MAX_VALUE) {
-                    dp[i] = Math.min(dp[i], dp[i - benefit] + cost);
-                }
+        int[] prev = new int[N];
+        Arrays.fill(prev, -1);
+
+        for (int i = 0; i < N; ++i) {
+            var n = numbers[i];
+            int pos = findPos(res, n);
+            if (pos == res.size()) {
+                res.add(n);
+                index.add(i);
+            } else {
+                res.set(pos, n);
+                index.set(pos, i);
+            }
+            if (pos > 0) {
+                prev[i] = index.get(pos - 1);
             }
         }
 
-        // [C, limit] 구간 내 최소 비용 반환
-        int res = Integer.MAX_VALUE;
-        for (int i = C; i <= limit; ++i) {
-            res = Math.min(res, dp[i]);
+        var sb = new StringBuilder();
+        sb.append(res.size()).append("\n");
+        var stack = new Stack<Integer>();
+        int idx = index.get(index.size() - 1);
+        while (idx != -1) {
+            stack.push(numbers[idx]);
+            idx = prev[idx];
         }
-        return res == Integer.MAX_VALUE ? -1 : res;
+        while (!stack.isEmpty()) {
+            sb.append(stack.pop()).append(" ");
+        }
+        return sb.toString();
+    }
+
+    int findPos(List<Integer> list, int target) {
+        // idx는 동일한 요소가 없는 경우, 자신보다 큰 요소가 처음으로 나오는 위치
+        var idx = Collections.binarySearch(list, target);
+        return idx < 0 ? -(idx + 1) : idx;
     }
 }

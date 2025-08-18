@@ -13,7 +13,7 @@ public class Main {
             for (int i = 0; i < T; ++i) {
                 System.err.println("\ncase " + (i + 1));
                 long start = System.currentTimeMillis();
-                IRunner runner = new Runner(br, bw);
+                Runner runner = new Runner(br, bw);
                 runner.run();
                 runner.flush();
                 long end = System.currentTimeMillis();
