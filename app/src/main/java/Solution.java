@@ -1,33 +1,41 @@
-import java.util.Arrays;
-
 class Solution {
-    public String solution(KeyBoard[] keyBoards) {
-        Arrays.sort(keyBoards);
+    public int solution(String time) {
+        var cases = new boolean[3][3];
 
-        var sb = new StringBuilder();
-        for (var kb : keyBoards) {
-            sb.append(kb.key);
+        var s = time.split(":");
+        for (int i = 0; i < 3; ++i) {
+            var t = Integer.parseInt(s[i]);
+            var c = cases[i];
+            if (isHour(t)) {
+                c[0] = true;
+            }
+            if (isMinuteOrSecond(t)) {
+                c[1] = true;
+                c[2] = true;
+            }
         }
-        return sb.toString();
+
+        var combinations = new int[][] {
+                new int[] { 0, 1, 2 },
+                new int[] { 0, 2, 1 },
+                new int[] { 1, 0, 2 },
+                new int[] { 1, 2, 0 },
+                new int[] { 2, 0, 1 },
+                new int[] { 2, 1, 0 }
+        };
+        int count = 0;
+        for (var comb : combinations) {
+            if (cases[0][comb[0]] && cases[1][comb[1]] && cases[2][comb[2]])
+                ++count;
+        }
+        return count;
     }
 
-}
-
-class KeyBoard implements Comparable<KeyBoard> {
-    final int id, delay;
-    final char key;
-
-    KeyBoard(int id, int delay, char key) {
-        this.id = id;
-        this.delay = delay;
-        this.key = key;
+    boolean isHour(int time) {
+        return time >= 1 && time <= 12;
     }
 
-    @Override
-    public int compareTo(KeyBoard o) {
-        if (this.delay == o.delay) {
-            return Integer.compare(this.id, o.id);
-        }
-        return Integer.compare(this.delay, o.delay);
+    boolean isMinuteOrSecond(int time) {
+        return time >= 0 && time < 60;
     }
 }

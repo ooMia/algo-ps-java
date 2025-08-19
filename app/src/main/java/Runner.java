@@ -7,21 +7,13 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    KeyBoard[] keyBoards;
+    final String time;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var M = reader.readInts()[1];
-            this.keyBoards = new KeyBoard[M];
-            for (int i = 0; i < M; ++i) {
-                var input = reader.line().split(" ");
-                var id = Integer.parseInt(input[0]);
-                var delay = Integer.parseInt(input[1]);
-                var key = input[2].charAt(0);
-                keyBoards[i] = new KeyBoard(id, delay, key);
-            }
+            this.time = reader.line();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -40,7 +32,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(keyBoards);
+        var res = sol.solution(time);
         sb.append(res).append('\n');
     }
 }
