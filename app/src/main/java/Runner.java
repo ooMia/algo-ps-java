@@ -7,13 +7,13 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String time;
+    final String[] lines;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.time = reader.line();
+            this.lines = reader.lines().toArray(String[]::new);
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -32,7 +32,10 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(time);
-        sb.append(res).append('\n');
+        for (var line : lines) {
+            if ("#".equals(line)) break;
+            var res = sol.solution(line);
+            sb.append(res).append('\n');
+        }
     }
 }
