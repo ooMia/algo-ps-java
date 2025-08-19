@@ -2,20 +2,20 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-class Runner  {
+class Runner {
     final Reader reader;
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N;
-    final int[] numbers;
+    final String A, B;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.N = reader.readInts()[0];
-            this.numbers = reader.readInts();
+            var _ab = reader.line().split(" ");
+            this.A = _ab[0];
+            this.B = _ab[1];
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -33,8 +33,8 @@ class Runner  {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(N, numbers);
-        var res = sol.solution();
+        var sol = new Solution();
+        var res = sol.solution(A, B);
         sb.append(res).append('\n');
     }
 }

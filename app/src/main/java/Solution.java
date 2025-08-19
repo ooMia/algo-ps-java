@@ -1,57 +1,24 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
 
 class Solution {
-    final int N;
-    final int[] numbers;
-
-    public Solution(int N, int[] number) {
-        this.N = N;
-        this.numbers = number;
-    }
-
-    public String solution() {
-        List<Integer> res = new ArrayList<>();
-        List<Integer> index = new ArrayList<>();
-
-        int[] prev = new int[N];
-        Arrays.fill(prev, -1);
-
-        for (int i = 0; i < N; ++i) {
-            var n = numbers[i];
-            int pos = findPos(res, n);
-            if (pos == res.size()) {
-                res.add(n);
-                index.add(i);
-            } else {
-                res.set(pos, n);
-                index.set(pos, i);
-            }
-            if (pos > 0) {
-                prev[i] = index.get(pos - 1);
+    public int solution(String A, String B) {
+        var A0 = A.charAt(0);
+        // String B에서 A0가 등장하는 위치의 인덱스에 대한 배열을 구한다.
+        var indices = new ArrayList<Integer>();
+        for (int i = 0; i < B.length(); ++i) {
+            if (B.charAt(i) == A0) {
+                indices.add(i);
             }
         }
 
-        var sb = new StringBuilder();
-        sb.append(res.size()).append("\n");
-        var stack = new Stack<Integer>();
-        int idx = index.get(index.size() - 1);
-        while (idx != -1) {
-            stack.push(numbers[idx]);
-            idx = prev[idx];
+        // 각 인덱스에 대해 회전 문자열을 생성한다.
+        // subString(B, i) + subString(B, 0, i)
+        for (int i : indices) {
+            var rotated = B.substring(i) + B.substring(0, i);
+            if (rotated.equals(A)) {
+                return i;
+            }
         }
-        while (!stack.isEmpty()) {
-            sb.append(stack.pop()).append(" ");
-        }
-        return sb.toString();
-    }
-
-    int findPos(List<Integer> list, int target) {
-        // idx는 동일한 요소가 없는 경우, 자신보다 큰 요소가 처음으로 나오는 위치
-        var idx = Collections.binarySearch(list, target);
-        return idx < 0 ? -(idx + 1) : idx;
+        return -1;
     }
 }
