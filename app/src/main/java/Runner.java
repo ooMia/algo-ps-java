@@ -7,13 +7,22 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String[] lines;
+    final Student[] students;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.lines = reader.lines().toArray(String[]::new);
+            var N = reader.readInts()[0];
+            students = new Student[N];
+            for (int i = 0; i < N; i++) {
+                var input = reader.line().split(" ");
+                var name = input[0];
+                var day = Integer.parseInt(input[1]);
+                var month = Integer.parseInt(input[2]);
+                var year = Integer.parseInt(input[3]);
+                students[i] = new Student(name, day, month, year);
+            }
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -32,10 +41,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        for (var line : lines) {
-            if ("#".equals(line)) break;
-            var res = sol.solution(line);
-            sb.append(res).append('\n');
-        }
+        var res = sol.solution(students);
+        sb.append(res).append('\n');
     }
 }

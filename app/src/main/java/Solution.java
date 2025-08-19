@@ -1,29 +1,29 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Calendar;
 
 class Solution {
-    Map<Character, Character> dict = new HashMap<>();
 
-    Solution() {
-        dict.put('b', 'd');
-        dict.put('d', 'b');
-        dict.put('p', 'q');
-        dict.put('q', 'p');
-        dict.put('i', 'i');
-        dict.put('o', 'o');
-        dict.put('v', 'v');
-        dict.put('w', 'w');
-        dict.put('x', 'x');
+    public String solution(Student[] students) {
+        Arrays.sort(students);
+        StringBuilder sb = new StringBuilder();
+        sb.append(students[students.length - 1].name).append('\n');
+        sb.append(students[0].name);
+        return sb.toString();
+    }
+}
+
+class Student implements Comparable<Student> {
+    final String name;
+    final Calendar birthDate;
+
+    Student(String name, int day, int month, int year) {
+        this.name = name;
+        this.birthDate = Calendar.getInstance();
+        this.birthDate.set(year, month - 1, day);
     }
 
-    public String solution(String reversed) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = reversed.length() - 1; i >= 0; --i) {
-            var c = reversed.charAt(i);
-            if (!dict.containsKey(c))
-                return "INVALID";
-            sb.append(dict.get(c));
-        }
-        return sb.toString();
+    @Override
+    public int compareTo(Student other) {
+        return this.birthDate.compareTo(other.birthDate);
     }
 }
