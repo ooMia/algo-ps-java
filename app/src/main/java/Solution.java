@@ -1,29 +1,20 @@
-import java.util.Arrays;
-import java.util.Calendar;
+import java.util.BitSet;
 
 class Solution {
 
-    public String solution(Student[] students) {
-        Arrays.sort(students);
-        StringBuilder sb = new StringBuilder();
-        sb.append(students[students.length - 1].name).append('\n');
-        sb.append(students[0].name);
-        return sb.toString();
-    }
-}
+    public int solution(int[][] records) {
+        int count = 0;
 
-class Student implements Comparable<Student> {
-    final String name;
-    final Calendar birthDate;
-
-    Student(String name, int day, int month, int year) {
-        this.name = name;
-        this.birthDate = Calendar.getInstance();
-        this.birthDate.set(year, month - 1, day);
-    }
-
-    @Override
-    public int compareTo(Student other) {
-        return this.birthDate.compareTo(other.birthDate);
+        var bs = new BitSet(200_000 + 1);
+        for (var r : records) {
+            int id = r[0];
+            boolean enter = r[1] > 0 ? true : false;
+            if (bs.get(id) == enter)
+                ++count;
+            bs.set(id, enter);
+        }
+        count += bs.cardinality();
+        
+        return count;
     }
 }
