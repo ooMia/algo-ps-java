@@ -1,24 +1,33 @@
-import java.util.ArrayList;
+import java.util.Arrays;
 
 class Solution {
-    public int solution(String A, String B) {
-        var A0 = A.charAt(0);
-        // String B에서 A0가 등장하는 위치의 인덱스에 대한 배열을 구한다.
-        var indices = new ArrayList<Integer>();
-        for (int i = 0; i < B.length(); ++i) {
-            if (B.charAt(i) == A0) {
-                indices.add(i);
-            }
-        }
+    public String solution(KeyBoard[] keyBoards) {
+        Arrays.sort(keyBoards);
 
-        // 각 인덱스에 대해 회전 문자열을 생성한다.
-        // subString(B, i) + subString(B, 0, i)
-        for (int i : indices) {
-            var rotated = B.substring(i) + B.substring(0, i);
-            if (rotated.equals(A)) {
-                return i;
-            }
+        var sb = new StringBuilder();
+        for (var kb : keyBoards) {
+            sb.append(kb.key);
         }
-        return -1;
+        return sb.toString();
+    }
+
+}
+
+class KeyBoard implements Comparable<KeyBoard> {
+    final int id, delay;
+    final char key;
+
+    KeyBoard(int id, int delay, char key) {
+        this.id = id;
+        this.delay = delay;
+        this.key = key;
+    }
+
+    @Override
+    public int compareTo(KeyBoard o) {
+        if (this.delay == o.delay) {
+            return Integer.compare(this.id, o.id);
+        }
+        return Integer.compare(this.delay, o.delay);
     }
 }
