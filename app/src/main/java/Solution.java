@@ -1,8 +1,7 @@
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 class Solution {
@@ -34,7 +33,7 @@ class Solution {
                 sb.append(i).append(' ');
             }
         }
-        Queue<Integer> pq = new LinkedList<>();
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
         for (var entry : nodes.entrySet()) {
             if (entry.getValue().inDegree == 0)
                 pq.add(entry.getKey());
