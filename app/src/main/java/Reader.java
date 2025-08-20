@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.stream.Stream;
 
 class Reader {
@@ -24,19 +25,21 @@ class Reader {
     }
 
     public int[] readInts() throws IOException {
-        String[] tokens = br.readLine().split(" ");
-        int[] ints = new int[tokens.length];
-        for (int i = 0; i < tokens.length; ++i) {
-            ints[i] = Integer.parseInt(tokens[i]);
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        int cnt = st.countTokens();
+        int[] ints = new int[cnt];
+        for (int i = 0; i < cnt; ++i) {
+            ints[i] = Integer.parseInt(st.nextToken());
         }
         return ints;
     }
 
     public List<Integer> readIntegers() throws IOException {
-        String[] tokens = br.readLine().split(" ");
-        var res = new ArrayList<Integer>(tokens.length);
-        for (String token : tokens) {
-            res.add(Integer.valueOf(token));
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        int cnt = st.countTokens();
+        List<Integer> res = new ArrayList<>(cnt);
+        for (int i = 0; i < cnt; ++i) {
+            res.add(Integer.parseInt(st.nextToken()));
         }
         return res;
     }
