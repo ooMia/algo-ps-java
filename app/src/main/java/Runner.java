@@ -7,16 +7,19 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int[][] records; 
+    final int N, M;
+    final int[][] priorities;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var N = reader.readInts()[0];
-            records = new int[N][];
-            for (int i = 0; i < N; i++) {
-                records[i] = reader.readInts();
+            var _nm = reader.readInts();
+            this.N = _nm[0];
+            this.M = _nm[1];
+            this.priorities = new int[M][];
+            for (int i = 0; i < M; ++i) {
+                priorities[i] = reader.readInts();
             }
 
             sb.ensureCapacity(20);
@@ -35,8 +38,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution();
-        var res = sol.solution(records);
+        var sol = new Solution(N, M, priorities);
+        var res = sol.solution();
         sb.append(res).append('\n');
     }
 }
