@@ -7,20 +7,13 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N, M;
-    final int[][] priorities;
+    final int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var _nm = reader.readInts();
-            this.N = _nm[0];
-            this.M = _nm[1];
-            this.priorities = new int[M][];
-            for (int i = 0; i < M; ++i) {
-                priorities[i] = reader.readInts();
-            }
+            this.numbers = reader.readInts();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -38,8 +31,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(N, M, priorities);
-        var res = sol.solution();
+        var sol = new Solution();
+        var res = sol.solution(numbers);
         sb.append(res).append('\n');
     }
 }
