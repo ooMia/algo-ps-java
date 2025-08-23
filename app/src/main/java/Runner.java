@@ -7,16 +7,15 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int N;
-    final String ioi;
+    final String N, M;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.N = Integer.parseInt(reader.line());
-            reader.skipLine();
-            this.ioi = reader.line();
+            var _nm = reader.line().split(" ");
+            this.N = _nm[0];
+            this.M = _nm[1];
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -34,8 +33,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(N, ioi);
-        var res = sol.solution();
+        var sol = new Solution();
+        var res = sol.solution(N, M);
         sb.append(res).append('\n');
     }
 }
