@@ -49,19 +49,12 @@ class Solution {
                 // 경우 2: 벽을 만남
                 else {
                     var newBreak = p.nBreak + 1;
-                    // 낮이고, 벽을 더 부술 수 있고, 해당 상태로 방문한 적 없다면
-                    if (p.isDay() && newBreak <= limitBreak && !isVisited(newBreak, newY, newX)) {
+                    // 벽을 더 부술 수 있고, 해당 상태로 방문한 적 없다면
+                    if (newBreak <= limitBreak && !isVisited(newBreak, newY, newX)) {
                         visited[newBreak][newY][newX] = newDist;
                         q.offer(new Point(newY, newX, newDist, newBreak));
                     }
                 }
-            }
-
-            // 경우 3: 제자리에서 대기
-            // 최초 방문 상황에서만 대기를 고려한다.
-            if (!p.isDay() && visited[p.nBreak][p.y][p.x] == p.dist) {
-                visited[p.nBreak][p.y][p.x] = newDist;
-                q.offer(new Point(p.y, p.x, newDist, p.nBreak));
             }
         }
         return -1;
@@ -79,10 +72,6 @@ class Solution {
             this.x = x;
             this.dist = dist;
             this.nBreak = nBreak;
-        }
-
-        boolean isDay() {
-            return dist % 2 == 1;
         }
     }
 }
