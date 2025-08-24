@@ -8,7 +8,7 @@ class Runner {
     final StringBuilder sb = new StringBuilder();
 
     final int nRows, nCols;
-    final String[] grid;
+    final char[][] grid;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
@@ -18,9 +18,9 @@ class Runner {
             this.nRows = input[0];
             this.nCols = input[1];
 
-            this.grid = new String[nRows];
+            this.grid = new char[nRows][];
             for (int i = 0; i < nRows; ++i) {
-                this.grid[i] = reader.line();
+                this.grid[i] = reader.line().toCharArray();
             }
 
             sb.ensureCapacity(20);

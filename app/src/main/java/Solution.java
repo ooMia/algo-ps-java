@@ -11,13 +11,10 @@ class Solution {
     final int[][] groupId;
     final int[][] length;
 
-    public Solution(int nRows, int nCols, String[] grid) {
+    public Solution(int nRows, int nCols, char[][] grid) {
         this.nRows = nRows;
         this.nCols = nCols;
-        this.grid = new char[nRows][];
-        for (int i = 0; i < nRows; i++) {
-            this.grid[i] = grid[i].toCharArray();
-        }
+        this.grid = grid;
 
         this.groupId = new int[nRows][nCols];
         this.length = new int[nRows][nCols];
@@ -48,17 +45,17 @@ class Solution {
                     continue;
                 set.put(groupId[newY][newX], length[newY][newX]);
             }
-            grid[p.y][p.x] -= '0';
-            grid[p.y][p.x] *= (set.values().stream().mapToInt(Integer::intValue).sum() + 1) % 10;
-            grid[p.y][p.x] += '0';
+
+            int sum = 0;
+            for (int value : set.values())
+                sum += value;
+            grid[p.y][p.x] = (char) (((sum + 1) % 10) + '0');
         }
 
         // 문자열을 이어붙여 반환
         var sb = new StringBuilder(nRows * (nCols + 1));
-        for (int y = 0; y < nRows; ++y) {
-            sb.append(grid[y]);
-            sb.append('\n');
-        }
+        for (int y = 0; y < nRows; ++y)
+            sb.append(grid[y]).append('\n');
         return sb.toString();
     }
 
