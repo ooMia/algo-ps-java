@@ -7,7 +7,7 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int nRows, nCols, K;
+    final int nRows, nCols;
     final String[] grid;
 
     Runner(BufferedReader br, BufferedWriter bw) {
@@ -17,7 +17,6 @@ class Runner {
             var input = reader.readInts();
             this.nRows = input[0];
             this.nCols = input[1];
-            this.K = input[2];
 
             this.grid = new String[nRows];
             for (int i = 0; i < nRows; ++i) {
@@ -40,7 +39,7 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(nRows, nCols, grid, K);
+        var sol = new Solution(nRows, nCols, grid, 1);
         var res = sol.solution();
         sb.append(res).append('\n');
     }
