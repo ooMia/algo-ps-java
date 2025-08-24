@@ -20,7 +20,7 @@ class Runner {
 
             this.grid = new String[nRows];
             for (int i = 0; i < nRows; ++i) {
-                grid[i] = reader.line();
+                this.grid[i] = reader.line();
             }
 
             sb.ensureCapacity(20);
@@ -39,7 +39,7 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(nRows, nCols, grid, 1);
+        var sol = new Solution(nRows, nCols, grid);
         var res = sol.solution();
         sb.append(res).append('\n');
     }
