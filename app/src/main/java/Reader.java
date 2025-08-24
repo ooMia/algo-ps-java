@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
@@ -42,5 +43,12 @@ class Reader {
             res.add(Integer.parseInt(st.nextToken()));
         }
         return res;
+    }
+
+    public int[][] readIntArrays() throws IOException {
+        return lines().map(s -> Arrays.stream(s.split(" "))
+                .mapToInt(Integer::parseInt)
+                .toArray())
+                .toArray(int[][]::new);
     }
 }
