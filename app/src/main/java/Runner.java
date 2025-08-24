@@ -1,9 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 class Runner {
@@ -12,7 +10,7 @@ class Runner {
     final StringBuilder sb = new StringBuilder();
 
     final int nNodes, rootId, nQueries;
-    final List<Set<Integer>> edges;
+    final Set<Integer>[] edges;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
@@ -23,15 +21,15 @@ class Runner {
             this.rootId = input[1];
             this.nQueries = input[2];
 
-            this.edges = new ArrayList<>(nNodes + 1);
+            this.edges = new HashSet[nNodes + 1];
             for (int i = 0; i < nNodes + 1; ++i) {
-                edges.add(new HashSet<>());
+                edges[i] = new HashSet<>();
             }
 
             for (int i = 1; i < nNodes; ++i) {
                 var edge = reader.readInts();
-                edges.get(edge[0]).add(edge[1]);
-                edges.get(edge[1]).add(edge[0]);
+                edges[edge[0]].add(edge[1]);
+                edges[edge[1]].add(edge[0]);
             }
 
             sb.ensureCapacity(20);
