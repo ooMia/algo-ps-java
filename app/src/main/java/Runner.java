@@ -7,13 +7,22 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final int[][] pairs;
+    final int nRows, nCols, K;
+    final String[] grid;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.pairs = reader.readIntArrays();
+            var input = reader.readInts();
+            this.nRows = input[0];
+            this.nCols = input[1];
+            this.K = input[2];
+
+            this.grid = new String[nRows];
+            for (int i = 0; i < nRows; ++i) {
+                grid[i] = reader.line();
+            }
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -31,10 +40,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution();
-        for (int i = 0; i < pairs.length - 1; ++i) {
-            var res = sol.solution(pairs[i][0], pairs[i][1]);
-            sb.append(res).append('\n');
-        }
+        var sol = new Solution(nRows, nCols, grid, K);
+        var res = sol.solution();
+        sb.append(res).append('\n');
     }
 }
