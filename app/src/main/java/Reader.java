@@ -35,6 +35,16 @@ class Reader {
         return ints;
     }
 
+    public long[] readLongs() throws IOException {
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        int cnt = st.countTokens();
+        long[] longs = new long[cnt];
+        for (int i = 0; i < cnt; ++i) {
+            longs[i] = Long.parseLong(st.nextToken());
+        }
+        return longs;
+    }
+
     public List<Integer> readIntegers() throws IOException {
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
         int cnt = st.countTokens();
