@@ -7,15 +7,13 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final long[] L1;
-    final long[] L2;
+    final String line;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.L1 = reader.readLongs();
-            this.L2 = reader.readLongs();
+            this.line = reader.line();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -34,7 +32,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(L1, L2);
+        var res = sol.solution(line);
         sb.append(res).append('\n');
     }
 }
