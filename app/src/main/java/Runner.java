@@ -7,13 +7,14 @@ class Runner {
     final BufferedWriter bw;
     final StringBuilder sb = new StringBuilder();
 
-    final String line;
+    final long[][] circles = new long[2][];
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.line = reader.line();
+            this.circles[0] = reader.readLongs();
+            this.circles[1] = reader.readLongs();
 
             sb.ensureCapacity(20);
         } catch (IOException e) {
@@ -32,7 +33,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(line);
+        var res = sol.solution(circles);
         sb.append(res).append('\n');
     }
 }
