@@ -17,13 +17,13 @@ class Runner {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.N = Integer.parseInt(reader.line());
+            this.N = Integer.parseInt(br.readLine());
             this.compressionMap = new HashMap<>(N, 1.0f);
             for (int i = 0; i < N; i++) {
-                String[] parts = reader.line().split(" ");
+                String[] parts = br.readLine().split(" ");
                 this.compressionMap.put(parts[1].charAt(0), parts[0]);
             }
-            this.compressed = reader.line();
+            this.compressed = br.readLine();
             var _lr = reader.readInts();
             this.l = _lr[0];
             this.r = _lr[1];
