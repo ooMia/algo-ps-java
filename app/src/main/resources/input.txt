@@ -1,24 +1,22 @@
 3
-5 17
-*****************
-.............**$*
-*B*A*P*C**X*Y*.X.
-*y*x*a*p**$*$**$*
-*****************
-cz
-5 11
-*.*********
-*...*...*x*
-*X*.*.*.*.*
-*$*...*...*
-***********
-0
-7 7
-*ABCDE*
-X.....F
-W.$$$.G
-V.$$$.H
-U.$$$.J
-T.....K
-*SQPML*
-irony
+3
+aa A
+bba B
+c C
+ABAC
+4 6
+5
+abcde A
+abcde B
+abcde C
+abcde D
+abcde E
+ABCDE
+1 25
+4
+e E
+f F
+g G
+h H
+EEEFEEE
+4 5
