@@ -2,19 +2,19 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-class Runner {
+class Runner  {
     final Reader reader;
     final BufferedWriter bw;
 
-    final long[] L1;
-    final long[] L2;
+    final int N;
+    final int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.L1 = reader.readLongs();
-            this.L2 = reader.readLongs();
+            this.N = Integer.parseInt(br.readLine());
+            this.numbers = reader.readInts();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -30,8 +30,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution();
-        var res = sol.solution(L1, L2);
+        var sol = new Solution(N, numbers);
+        var res = sol.solution();
         bw.write(String.valueOf(res));
     }
 }
