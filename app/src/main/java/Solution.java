@@ -1,32 +1,78 @@
+import java.util.BitSet;
+
 class Solution {
     final int N;
-    final int[] numbers;
+    final BitSet positions;
 
-    public Solution(int N, int[] number) {
+    final int[] dy = { -1, -1, 1, 1 };
+    final int[] dx = { -1, 1, -1, 1 };
+
+    Solution(int N, BitSet positions) {
         this.N = N;
-        this.numbers = number;
+        this.positions = positions;
     }
 
     public int solution() {
-        int[] dp = new int[N]; // 자신이 마지막 원소인 부분 수열의 최대 합
-        for (int i = 0; i < N; ++i)
-            dp[i] = numbers[i];
+        if (N == 1)
+            return positions.get(0) ? 1 : 0;
+        int maxBishop = 0, i = positions.nextSetBit(0);
+        while (i >= 0) {
+            int res = dfs(i, 1);
+            maxBishop = Math.max(maxBishop, res);
+            i = positions.nextSetBit(i + 1);
+        }
+        return maxBishop;
+    }
 
-        // DP 계산
-        for (int i = 1; i < N; ++i) {
-            int curNum = numbers[i];
-            for (int j = 0; j < i; ++j) {
-                int prevNum = numbers[j];
-                if (prevNum < curNum) {
-                    dp[i] = Math.max(dp[i], dp[j] + curNum);
+    int dfs(int idx, final int depth) {
+        if (idx < 0 || idx >= N * N)
+            return depth;
+
+        var removed = putBishop(idx);
+
+        int i = positions.nextSetBit(idx + 1);
+        int maxDepth = depth;
+        while (i >= 0) {
+            var removed2 = putBishop(i);
+            int res = dfs(i, depth + 1);
+            resetBoard(removed2);
+
+            maxDepth = Math.max(maxDepth, res);
+            i = positions.nextSetBit(i + 1);
+        }
+
+        resetBoard(removed);
+
+        return maxDepth;
+    }
+
+    BitSet putBishop(int pos) {
+        BitSet removed = new BitSet(N * N);
+        removed.set(pos);
+
+        int row = pos / N;
+        int col = pos % N;
+
+        // 각 대각선 방향으로 탐색
+        for (int dir = 0; dir < 4; dir++) {
+            int r = row + dy[dir];
+            int c = col + dx[dir];
+
+            while (r >= 0 && r < N && c >= 0 && c < N) {
+                int idx = r * N + c;
+                if (positions.get(idx)) {
+                    removed.set(idx);
                 }
+                r += dy[dir];
+                c += dx[dir];
             }
         }
 
-        int res = Integer.MIN_VALUE;
-        for (int i = 0; i < N; i++) {
-            res = Math.max(res, dp[i]);
-        }
-        return res;
+        positions.andNot(removed); // clear positions
+        return removed;
+    }
+
+    void resetBoard(BitSet removed) {
+        positions.or(removed);
     }
 }
