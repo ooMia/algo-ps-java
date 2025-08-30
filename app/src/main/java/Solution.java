@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 class Solution {
     final int N;
     final int[] numbers;
@@ -11,43 +8,25 @@ class Solution {
     }
 
     public int solution() {
-        List<Integer> res = new ArrayList<>();
+        int[] dp = new int[N]; // 자신이 마지막 원소인 부분 수열의 최대 합
+        for (int i = 0; i < N; ++i)
+            dp[i] = numbers[i];
 
-        for (int i = 0; i < N; ++i) {
-            var n = numbers[i];
-            int pos = findPos(res, n);
-            if (pos == res.size()) {
-                res.add(n);
-            } else {
-                res.set(pos, n);
+        // DP 계산
+        for (int i = 1; i < N; ++i) {
+            int curNum = numbers[i];
+            for (int j = 0; j < i; ++j) {
+                int prevNum = numbers[j];
+                if (prevNum < curNum) {
+                    dp[i] = Math.max(dp[i], dp[j] + curNum);
+                }
             }
         }
 
-        return res.size();
-    }
-
-    int findPos(List<Integer> list, int target) {
-        var idx = indexedBinarySearch(list, target);
-        return idx < 0 ? -(idx + 1) : idx;
-    }
-
-    // @reference Collections.binarySearch
-    int indexedBinarySearch(List<Integer> list, Integer key) {
-        int low = 0;
-        int high = list.size() - 1;
-
-        while (low <= high) {
-            int mid = (low + high) >>> 1;
-            Integer midVal = list.get(mid);
-            int cmp = midVal.compareTo(key);
-
-            if (cmp < 0) // midVal < key
-                high = mid - 1; // assume descending order
-            else if (cmp > 0)
-                low = mid + 1; // assume descending order
-            else
-                return mid; // key found
+        int res = Integer.MIN_VALUE;
+        for (int i = 0; i < N; i++) {
+            res = Math.max(res, dp[i]);
         }
-        return -(low + 1); // key not found
+        return res;
     }
 }
