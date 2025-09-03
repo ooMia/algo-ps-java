@@ -6,13 +6,13 @@ class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final int N;
+    final char letter;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            this.N = Integer.parseInt(br.readLine());
+            this.letter = br.readLine().charAt(0);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -28,7 +28,7 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var res = new Solution(N).solution();
+        var res = new Solution().solution(letter);
         bw.write(String.valueOf(res));
     }
 }
