@@ -1,48 +1,82 @@
 class Solution {
-    final int id, o;
-    int w, status = 1;
 
-    /**
-     * @param id 시나리오 번호
-     * @param o  적정 체중
-     * @param w  현재 체중
-     */
-    Solution(int id, int o, int w) {
-        this.id = id;
-        this.o = o;
-        this.w = w;
+    interface Judge {
+        void pullLever(); // 레버 당기기 (레버 상태 토글)
+
+        void waitSecond(); // 1초 기다리기 (카트를 다음 구역으로 이동시킴)
     }
 
-    void solution(char behavior, int value) {
-        if (status < 0) // Dead
-            return;
-        switch (behavior) {
-            case 'F': // Increase weight
-                w += value;
-                break;
-            case 'E': // Decrease weight
-                w -= value;
-                break;
-        }
+    interface Cart {
+        void move(); // 다음 구역으로 이동 ('A', 'B', 'C')
 
-        if (w <= 0) // Dead
-            status = -1;
-        else if (o / 2 < w && w < o * 2) // Success
-            status = 1;
-        else // Fail
-            status = 0;
+        int crash(); // C 구역이라는 가정 하에 주어진 레버 상태를 토대로 충돌한 마네킹 수 반환
     }
 
-    String status() {
-        return switch (status) {
-            case -1 -> "RIP";
-            case 0 -> ":-(";
-            default -> ":-)";
+    // 심판자, 레버, 트랙
+    // 레버는 당기지 않은 상태, 선로는 2번 선로, 각 선로에는 각각 1, 5개의 마네킹이 있는 상태로 시작
+
+    boolean lever = false, leverPulledOnAreaB = false;
+    char cartArea = 'A';
+
+    Cart cart;
+    Judge judge;
+
+    Solution() {
+        this.cart = new Cart() {
+            @Override
+            public void move() {
+                if (cartArea == 'C')
+                    return; // C 구역에서는 이동하지 않음
+                cartArea++;
+            }
+
+            @Override
+            public int crash() {
+                if (cartArea == 'C') {
+                    if (leverPulledOnAreaB)
+                        return 6; // B 구역에서 레버가 당겨진 경우
+                    return lever ? 1 : 5;
+                }
+                return 0; // 아직 C 구역에 도달하지 않음
+            }
         };
+
+        this.judge = new Judge() {
+            @Override
+            public void pullLever() {
+                switch (cartArea) {
+                    case 'B':
+                        leverPulledOnAreaB = true;
+                    case 'A':
+                        lever = !lever;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void waitSecond() {
+                if (cartArea == 'C')
+                    return; // C 구역에서는 이동하지 않음
+                cartArea++;
+            }
+        };
+
     }
 
-    @Override
-    public String toString() {
-        return String.format("%d %s", id, status());
+    int solution(int nCommands, String commands) {
+        for (int i = 0; i < nCommands; ++i) {
+            char command = commands.charAt(i);
+            switch (command) {
+                case 'P':
+                    judge.pullLever();
+                    break;
+                case 'W':
+                    judge.waitSecond();
+                    break;
+            }
+        }
+        return cart.crash();
     }
+
 }
