@@ -1,23 +1,20 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final int A, B, C, M; // A: 피로도 증가량, B: 처리량, C: 피로도 감소량, M: 최대 피로도
+    final Stream<String> inputs;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var input = reader.readInts();
-            this.A = input[0];
-            this.B = input[1];
-            this.C = input[2];
-            this.M = input[3];
-        } catch (IOException e) {
+            inputs = br.lines();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -32,7 +29,25 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var res = new Solution().solution(A, B, C, M);
-        bw.write(String.valueOf(res));
+        final String endOfScenario = "# 0", endOfCase = "0 0";
+        var iter = inputs.iterator();
+
+        int id = 1;
+        while (true) {
+            var line1 = iter.next();
+            if (endOfCase.equals(line1))
+                break;
+
+            var s1 = line1.split(" ");
+            var sol = new Solution(id++, Integer.parseInt(s1[0]), Integer.parseInt(s1[1]));
+            while (true) {
+                var line2 = iter.next();
+                if (endOfScenario.equals(line2))
+                    break;
+                var s2 = line2.split(" ");
+                sol.solution(s2[0].charAt(0), Integer.parseInt(s2[1]));
+            }
+            bw.write(sol.toString() + "\n");
+        }
     }
 }

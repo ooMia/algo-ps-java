@@ -1,23 +1,48 @@
 class Solution {
+    final int id, o;
+    int w, status = 1;
+
     /**
-     * @param A 피로도 증가량
-     * @param B 처리량
-     * @param C 피로도 감소량
-     * @param M 최대 피로도
-     * @return 피로도 M을 넘지 않고 24시간 내에 처리할 수 있는 최대 처리량
+     * @param id 시나리오 번호
+     * @param o  적정 체중
+     * @param w  현재 체중
      */
-    public int solution(int A, int B, int C, int M) {
-        int time, fatigue, workDone;
-        time = fatigue = workDone = 0;
-        while (time < 24) {
-            if (fatigue + A > M) {
-                fatigue = Math.max(0, fatigue - C);
-            } else {
-                fatigue += A;
-                workDone += B;
-            }
-            ++time;
+    Solution(int id, int o, int w) {
+        this.id = id;
+        this.o = o;
+        this.w = w;
+    }
+
+    void solution(char behavior, int value) {
+        if (status < 0) // Dead
+            return;
+        switch (behavior) {
+            case 'F': // Increase weight
+                w += value;
+                break;
+            case 'E': // Decrease weight
+                w -= value;
+                break;
         }
-        return workDone;
+
+        if (w <= 0) // Dead
+            status = -1;
+        else if (o / 2 < w && w < o * 2) // Success
+            status = 1;
+        else // Fail
+            status = 0;
+    }
+
+    String status() {
+        return switch (status) {
+            case -1 -> "RIP";
+            case 0 -> ":-(";
+            default -> ":-)";
+        };
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d %s", id, status());
     }
 }
