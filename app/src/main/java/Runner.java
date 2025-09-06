@@ -6,15 +6,18 @@ class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final int N;
-    final int[] numbers;
+    final int size;
+    final int[][] grid;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            N = Integer.parseInt(br.readLine());
-            numbers = reader.readInts();
+            size = Integer.parseInt(br.readLine());
+            grid = new int[size][];
+            for (int r = 0; r < size; ++r)
+                grid[r] = reader.readInts();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -30,8 +33,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution();
-        var res = sol.solution(N, numbers);
+        var sol = new Solution(size, grid);
+        var res = sol.solution();
         bw.write(String.valueOf(res));
     }
 }

@@ -1,34 +1,33 @@
+import java.util.Arrays;
+
 class Solution {
-    String solution(int N, int[] numbers) {
-        long numerator = 0, denominator = 1;
 
-        // 주어진 자연수의 역수의 합
-        for (long number: numbers) {
-            long lcm = lcm(denominator, number);
+    final int size;
+    final int[][] grid;
 
-            numerator *= (lcm / denominator);
-            numerator += (lcm / number);
-            denominator = lcm;
-        }
-
-        long gcd = gcd(numerator, denominator); // 기약분수화
-        numerator /= gcd;
-        denominator /= gcd;
-
-        // 결과 출력
-        return String.format("%s/%s", denominator, numerator);
+    Solution(int size, int[][] grid) {
+        this.size = size;
+        this.grid = grid;
     }
 
-    long lcm(long a, long b) {
-        return a / gcd(a, b) * b;
+    int solution() {
+        if (size == 1)
+            return grid[0][0];
+
+        return solve(0, 0, size);
     }
 
-    long gcd(long a, long b) {
-        while (b != 0) {
-            long temp = b;
-            b = a % b;
-            a = temp;
+    int solve(int r, int c, int size) {
+        if (size == 1) return grid[r][c];
+        if (size == 2) {
+            int[] values = {grid[r][c], grid[r][c + 1], grid[r + 1][c], grid[r + 1][c + 1]};
+            Arrays.sort(values);
+            return values[1];
         }
-        return a;
+
+        int midR = r + size / 2, midC = c + size / 2;
+        int[] values = { solve(r, c, size / 2), solve(r, midC, size / 2), solve(midR, c, size / 2), solve(midR, midC, size / 2) };
+        Arrays.sort(values);
+        return values[1];
     }
 }
