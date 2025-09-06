@@ -1,20 +1,34 @@
 class Solution {
-    String solution(int N) {
-        var res = new int[N];
-        res[0] = N;
+    String solution(int N, int[] numbers) {
+        long numerator = 0, denominator = 1;
 
-        int cur = -N + 1;
-        for (int i = 1; i < N; ++i) {
-            res[i] = res[i - 1] + cur;
-            int sign = cur > 0 ? +1 : -1;
-            cur = -sign * (Math.abs(cur) - 1);
+        // 주어진 자연수의 역수의 합
+        for (long number: numbers) {
+            long lcm = lcm(denominator, number);
+
+            numerator *= (lcm / denominator);
+            numerator += (lcm / number);
+            denominator = lcm;
         }
 
-        var sb = new StringBuilder();
-        sb.ensureCapacity(N * 2);
-        for (int i = 0; i < N; ++i) {
-            sb.append(res[i]).append(' ');
+        long gcd = gcd(numerator, denominator); // 기약분수화
+        numerator /= gcd;
+        denominator /= gcd;
+
+        // 결과 출력
+        return String.format("%s/%s", denominator, numerator);
+    }
+
+    long lcm(long a, long b) {
+        return a / gcd(a, b) * b;
+    }
+
+    long gcd(long a, long b) {
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
         }
-        return sb.toString();
+        return a;
     }
 }

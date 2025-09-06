@@ -7,12 +7,14 @@ class Runner {
     final BufferedWriter bw;
 
     final int N;
+    final int[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
             N = Integer.parseInt(br.readLine());
+            numbers = reader.readInts();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -29,7 +31,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(N);
+        var res = sol.solution(N, numbers);
         bw.write(String.valueOf(res));
     }
 }
