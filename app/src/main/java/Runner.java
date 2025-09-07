@@ -6,17 +6,15 @@ class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final int size;
-    final int[][] grid;
+    final String A, B;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            size = Integer.parseInt(br.readLine());
-            grid = new int[size][];
-            for (int r = 0; r < size; ++r)
-                grid[r] = reader.readInts();
+            var ab = br.readLine().split(" ");
+            A = ab[0];
+            B = ab[1];
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -33,7 +31,7 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(size, grid);
+        var sol = new Solution(A,B);
         var res = sol.solution();
         bw.write(String.valueOf(res));
     }

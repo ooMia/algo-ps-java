@@ -1,11 +1,6 @@
-3
-1
-1024
-2
-2 0
-3 1
-4
-15 7 13 5
-4 2 1 9
-0 10 8 12
-3 11 14 6
+5
+adaabc aababbc
+hello xello
+koder topcoder
+abc topabcoder
+giorgi igroig

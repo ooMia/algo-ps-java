@@ -1,33 +1,27 @@
-import java.util.Arrays;
-
 class Solution {
+    final String from, to;
 
-    final int size;
-    final int[][] grid;
-
-    Solution(int size, int[][] grid) {
-        this.size = size;
-        this.grid = grid;
+    Solution(String from, String to) {
+        this.from = from;
+        this.to = to;
     }
 
     int solution() {
-        if (size == 1)
-            return grid[0][0];
-
-        return solve(0, 0, size);
+        int minDiff = Integer.MAX_VALUE;
+        for (int i = 0; i + from.length() <= to.length(); ++i) {
+            System.err.println(i);
+            minDiff = Math.min(minDiff, difference(i));
+        }
+        return minDiff;
     }
 
-    int solve(int r, int c, int size) {
-        if (size == 1) return grid[r][c];
-        if (size == 2) {
-            int[] values = {grid[r][c], grid[r][c + 1], grid[r + 1][c], grid[r + 1][c + 1]};
-            Arrays.sort(values);
-            return values[1];
-        }
-
-        int midR = r + size / 2, midC = c + size / 2;
-        int[] values = { solve(r, c, size / 2), solve(r, midC, size / 2), solve(midR, c, size / 2), solve(midR, midC, size / 2) };
-        Arrays.sort(values);
-        return values[1];
+    int difference(int iStart) {
+        // iStart + from.length() <= to.length()를 만족하는 iStart에 대해
+        // to.subStr(iStart, to.length())과 from의 차이를 구한다.
+        int diff = 0;
+        for (int i = 0; i < from.length(); ++i)
+            if (from.charAt(i) != to.charAt(iStart + i))
+                ++diff;
+        return diff;
     }
 }
