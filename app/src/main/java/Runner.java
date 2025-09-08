@@ -6,13 +6,13 @@ class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final String A, B;
+    final int A,B;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var ab = br.readLine().split(" ");
+            var ab = reader.readInts();
             A = ab[0];
             B = ab[1];
 
@@ -31,8 +31,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(A,B);
-        var res = sol.solution();
+        var sol = new Solution();
+        var res = sol.solution(A,B);
         bw.write(String.valueOf(res));
     }
 }
