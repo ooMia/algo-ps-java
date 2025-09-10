@@ -1,10 +1,9 @@
 class Solution {
-    int solution(int A, int B) {
-        int res = 1;
-        for (int i = 0; i < B; ++i) {
-            res *= A;
-            res %= 10;
-        }
-        return res == 0 ? 10 : res;
+    String solution(int[] A, int[] C) {
+        int[] res = new int[3];
+        res[0] = C[0] - A[2];
+        res[1] = C[1] / A[1];
+        res[2] = C[2] - A[0];
+        return String.format("%d %d %d", res[0], res[1], res[2]);
     }
 }
