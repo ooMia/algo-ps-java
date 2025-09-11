@@ -6,10 +6,13 @@ class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
+    final int N;
+
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
+            N = Integer.parseInt(br.readLine());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -27,12 +30,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        while (true) {
-            var abc = reader.readInts();
-            if (abc[0] == -1 && abc[1] == -1 && abc[2] == -1)
-                break;
-            var res = sol.solution(abc[0], abc[1], abc[2]);
-            bw.write(String.valueOf(res));
-        }
+        var res = sol.solution(N);
+        bw.write(String.valueOf(res));
     }
 }

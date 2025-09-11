@@ -1,23 +1,35 @@
 class Solution {
-    int[][][] dp = new int[21][21][21];
+    // 숫자 n으로 시작하고, 길이가 m인 자연수 중 계단 수에 해당하는 수의 개수
+    long[][] dp = new long[10][100 + 1];
 
-    int w(int a, int b, int c) {
-        if (a <= 0 || b <= 0 || c <= 0)
-            return 1;
-        if (a > 20 || b > 20 || c > 20)
-            return w(20, 20, 20);
-        if (dp[a][b][c] != 0)
-            return dp[a][b][c];
-        if (a < b && b < c)
-            return dp[a][b][c] = w(a, b, c - 1) + w(a, b - 1, c - 1) - w(a, b - 1, c);
-        return dp[a][b][c] = w(a - 1, b, c) + w(a - 1, b - 1, c) + w(a - 1, b, c - 1) - w(a - 1, b - 1, c - 1);
+    int mod = 1_000_000_000;
+
+    Solution() {
+        // 한 자리수는 모두 계단 수
+        for (int i = 1; i <= 9; i++) {
+            dp[i][1] = 1;
+        }
     }
 
-    String solution(int a, int b, int c) {
-        return format(a, b, c, w(a, b, c));
-    }
+    long solution(int N) {
+        if (N == 1)
+            return 9;
 
-    String format(int a, int b, int c, int res) {
-        return String.format("w(%d, %d, %d) = %d\n", a, b, c, res);
+        for (int len = 2; len <= N; ++len) {
+            for (int num = 0; num <= 9; ++num) {
+                if (num == 0) {
+                    dp[num][len] = dp[num + 1][len - 1] % mod;
+                } else if (num == 9) {
+                    dp[num][len] = dp[num - 1][len - 1] % mod;
+                } else {
+                    dp[num][len] = (dp[num - 1][len - 1] + dp[num + 1][len - 1]) % mod;
+                }
+            }
+        }
+
+        long ans = 0;
+        for (int i = 0; i <= 9; ++i)
+            ans = (ans + dp[i][N]) % mod;
+        return ans;
     }
 }
