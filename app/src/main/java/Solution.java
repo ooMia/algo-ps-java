@@ -1,47 +1,71 @@
 class Solution {
-    // 45656이란 수를 보자.
-    // 이 수는 인접한 모든 자리의 차이가 1이다. 이런 수를 계단 수라고 한다.
-    // N이 주어질 때, 길이가 N이면서 0부터 9까지 숫자가 모두 등장하는 계단 수가 총 몇 개 있는지 구하는 프로그램을 작성하시오.
-    // 0으로 시작하는 수는 계단수가 아니다.
+    // 두 자연수 A, B가 주어졌을 때,
+    // A ≤ x ≤ B를 만족하는 모든 x에 대해 x를 이진수로 표현했을 때
+    // 1의 개수의 합을 구하는 프로그램을 작성하시오.
 
-    // 숫자 K로 끝나면서 길이가 N이고, mask가 M인 계단 수의 개수
-    final long[][][] dp = new long[10][100 + 1][1 << 10];
-    final long mod = 1_000_000_000;
-    final int FULL_MASK = (1 << 10) - 1;
+    // 2^x <= k < 2^(x+1)를 만족하는 모든 k를 이진수로 표현했을 때 1의 개수의 합
+    long dp[] = new long[54 + 1]; // log_2(10^16) < 54
 
     Solution() {
-        for (int i = 1; i <= 9; ++i) {
-            dp[i][1][1 << i] = 1;
+        // 주어진 비트가 1개면 dp[0] = 1
+        // 주어진 비트가 2개면 dp[1] = 2^1 + 2 * dp[0]
+        // 주어진 비트가 3개면 dp[2] = 2^2 + 2 * dp[1]
+        dp[0] = 1;
+        for (int bit = 1; bit <= 54; ++bit) {
+            dp[bit] = (1L << bit) + 2 * dp[bit - 1];
         }
     }
 
-    long solution(int N) {
-        if (N < 10)
+    /**
+     * A부터 B까지의 모든 수에 대해 이진수 표현 시 1의 개수 총합을 구합니다.
+     * 
+     * @param A 시작 자연수
+     * @param B 끝 자연수
+     * @return 1의 개수 총합
+     */
+    long solution(long A, long B) {
+        return countSetBits(B) - countSetBits(A - 1);
+    }
+
+    /**
+     * 0부터 n까지의 모든 수에 대해 이진수 표현 시 1의 개수 총합을 구합니다.
+     * 
+     * @param n 끝 자연수
+     * @return 1의 개수 총합
+     */
+    long countSetBits(long n) {
+        if (n <= 0) {
             return 0;
-
-        for (int n = 2; n <= N; ++n) {// 길이
-            for (int k = 0; k <= 9; ++k) { // 끝나는 숫자
-                for (int m = 0; m <= FULL_MASK; ++m) {
-                    // 0보다 큰 수로 끝난다면 이전 끝 수는 k-1 가능
-                    int newMask = m | (1 << k);
-                    if (k > 0) {
-                        int prev = k - 1;
-                        dp[k][n][newMask] += dp[prev][n - 1][m];
-                    }
-                    // 9보다 작은 수로 끝난다면 이전 끝 수는 k+1 가능
-                    if (k < 9) {
-                        int prev = k + 1;
-                        dp[k][n][newMask] += dp[prev][n - 1][m];
-                    }
-                    dp[k][n][newMask] %= mod;
-                }
-            }
         }
 
-        long ans = 0;
-        for (int n = 0, mask = FULL_MASK; n <= 9; ++n) {
-            ans = (ans + dp[n][N][mask]) % mod;
+        // n의 최상위 비트(MSB) 위치를 찾습니다. (0-indexed)
+        // 예를 들어 n=13 (1101)이면, msbPos = 3
+        int msbPos = getMsbPosition(n);
+
+        // 1. [0, 2^msbPos - 1] 구간의 1의 개수
+        // dp 배열의 정의에 따라 dp[msbPos-1] 입니다.
+        long count = (msbPos > 0) ? dp[msbPos - 1] : 0;
+
+        // 2. [2^msbPos, n] 구간의 최상위 비트(MSB)에 대한 1의 개수
+        // 이 구간의 모든 수는 msbPos 위치에 1을 가집니다.
+        // 구간의 숫자 개수는 (n - 2^msbPos + 1) 입니다.
+        long remainder = n - (1L << msbPos);
+        count += (remainder + 1);
+
+        // 3. [2^msbPos, n] 구간에서 MSB를 제외한 나머지 비트들의 1의 개수
+        // 이는 [0, remainder] 구간의 1의 개수와 같습니다.
+        // 재귀적으로 계산합니다.
+        count += countSetBits(remainder);
+
+        return count;
+    }
+
+    int getMsbPosition(long n) {
+        int pos = 0;
+        // 1L을 계속 왼쪽으로 시프트하면서 n보다 커지기 직전까지의 위치를 찾습니다.
+        while ((1L << (pos + 1)) <= n) {
+            pos++;
         }
-        return ans;
+        return pos;
     }
 }
