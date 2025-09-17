@@ -1,20 +1,26 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final long A, B;
+    final int N;
+    final Map<Integer, Integer> closet = new HashMap<>();
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var line = reader.readLongs();
-            A = line[0];
-            B = line[1];
+            N = Integer.parseInt(br.readLine());
+            for (int i = 0; i < N; ++i) {
+                String[] parts = br.readLine().split(" ");
+                int type = parts[1].hashCode();
+                closet.put(type, closet.getOrDefault(type, 0) + 1);
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -31,8 +37,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution();
-        var res = sol.solution(A, B);
+        var sol = new Solution(closet);
+        var res = sol.solution();
         bw.write(String.valueOf(res));
     }
 }
