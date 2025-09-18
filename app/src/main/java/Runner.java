@@ -1,25 +1,18 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final Map<String, Integer> closet = new HashMap<>();
+    final int n;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            int N = Integer.parseInt(br.readLine());
-            for (int i = 0; i < N; ++i) {
-                String[] parts = br.readLine().split(" ");
-                String type = parts[1];
-                closet.put(type, closet.getOrDefault(type, 0) + 1);
-            }
+            this.n = Integer.parseInt(br.readLine());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -36,8 +29,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution();
-        var res = sol.solution(closet);
+        var sol = new Solution(n);
+        var res = sol.solution();
         bw.write(String.valueOf(res));
     }
 }
