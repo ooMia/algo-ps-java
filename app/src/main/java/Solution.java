@@ -1,22 +1,20 @@
 class Solution {
-    final int n;
-    final int[] dp;
+    int solution(int n, int m) {
+        // (0, n) 구간 내 a < b를 만족하는 정수 쌍 (a, b)에 대해
+        // (a^2 + b^2 + m) % (a * b) == 0 인 쌍의 개수
 
-    Solution(int n) {
-        this.n = n;
-        this.dp = new int[n + 1];
+        int res = 0;
+        for (int a = 1; a < n; ++a) {
+            for (int b = a + 1; b < n; ++b) {
+                if (isValid(a, b, m)) {
+                    res++;
+                }
+            }
+        }
+        return res;
     }
 
-    int solution() {
-        // dp[i] = i를 제곱수의 합으로 나타낼 때, 필요한 최소 항의 개수
-        // [1, n] 구간의 모든 자연수 i와 i 이하의 제곱수 j*j에 대해 dp[i - j*j] + 1의 최솟값으로 갱신
-        for (int i = 1; i <= n; ++i) {
-            int ans = Integer.MAX_VALUE;
-            for (int j = 1; j * j <= i; ++j) {
-                ans = Math.min(ans, dp[i - j * j] + 1);
-            }
-            dp[i] = ans;
-        }
-        return dp[n];
+    boolean isValid(int a, int b, int m) {
+        return (a * a + b * b + m) % (a * b) == 0;
     }
 }
