@@ -1,20 +1,22 @@
-class Solution {
-    int solution(int n, int m) {
-        // (0, n) 구간 내 a < b를 만족하는 정수 쌍 (a, b)에 대해
-        // (a^2 + b^2 + m) % (a * b) == 0 인 쌍의 개수
+import java.util.LinkedList;
+import java.util.List;
 
+class Solution {
+    int solution(int n, int[] numbers) {
+        List<Integer> odds = new LinkedList<>();
         int res = 0;
-        for (int a = 1; a < n; ++a) {
-            for (int b = a + 1; b < n; ++b) {
-                if (isValid(a, b, m)) {
-                    res++;
-                }
+        for (int num : numbers) {
+            if ((num & 1) == 0) {
+                res += num;
+            } else {
+                odds.add(num);
             }
         }
+        odds.sort((a, b) -> b - a);
+        // 한 번에 두 개씩 묶어서 더하기
+        for (int i = 0; i + 1 < odds.size(); i += 2) {
+            res += odds.get(i) + odds.get(i + 1);
+        }
         return res;
-    }
-
-    boolean isValid(int a, int b, int m) {
-        return (a * a + b * b + m) % (a * b) == 0;
     }
 }
