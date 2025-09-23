@@ -1,17 +1,24 @@
-import java.util.BitSet;
-
 class Solution {
-    int solution(int nRows, int nCols, boolean[][] board) {
-        BitSet rows = new BitSet(nRows);
-        BitSet cols = new BitSet(nCols);
-        for (int i = 0; i < nRows; ++i) {
-            for (int j = 0; j < nCols; ++j) {
-                if (board[i][j]) {
-                    rows.set(i);
-                    cols.set(j);
-                }
-            }
+    final String target = "2023";
+
+    int solution(int N) {
+        int res = 0;
+        for (int i = 2022; i <= N; ++i) {
+            var s = String.valueOf(i);
+            if (isTarget(s))
+                ++res;
         }
-        return Math.max(nRows - rows.cardinality(), nCols - cols.cardinality());
+        return res;
+    }
+
+    boolean isTarget(String s) {
+        int prevIdx = 0;
+        for (int t = 0; t < target.length(); ++t) {
+            var idx = s.substring(prevIdx).indexOf(target.charAt(t));
+            if (idx == -1)
+                return false;
+            prevIdx += idx + 1;
+        }
+        return true;
     }
 }
