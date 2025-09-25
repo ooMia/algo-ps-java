@@ -6,16 +6,12 @@ class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final int N, A, B;
-
+final String S;
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            var input = reader.readInts();
-            N = input[0];
-            A = input[1];
-            B = input[2];
+            S = br.readLine();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -32,7 +28,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(N, A, B);
+        var res = sol.solution(S);
         bw.write(String.valueOf(res));
     }
 }

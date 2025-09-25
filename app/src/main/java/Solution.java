@@ -1,8 +1,7 @@
 class Solution {
-    private final String bus = "Bus", subway = "Subway", anything = "Anything";
+    private final String from = "PO", to = "PHO";
 
-    String solution(int N, int A, int B) {
-        if (A == B) return anything;
-        return A < B ? bus : subway;
+    String solution(String S) {
+        return S.replace(from, to);
     }
 }
