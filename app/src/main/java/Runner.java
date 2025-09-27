@@ -6,13 +6,13 @@ class Runner {
     final Reader reader;
     final BufferedWriter bw;
 
-    final int k;
+    final int N;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.reader = new Reader(br);
         this.bw = bw;
         try {
-            k = Integer.parseInt(br.readLine());
+            N = Integer.parseInt(br.readLine());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -28,8 +28,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution();
-        var res = sol.solution(k);
+        var sol = new Solution(N);
+        var res = sol.solution();
         _write(res);
     }
 
