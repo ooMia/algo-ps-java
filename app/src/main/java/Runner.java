@@ -28,8 +28,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(N);
-        var res = sol.solution();
+        var sol = new Solution();
+        var res = sol.solution(N);
         _write(res);
     }
 
