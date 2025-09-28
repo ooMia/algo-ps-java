@@ -1,24 +1,33 @@
 class Solution {
-    String solution(int N) {
+    String solution(String initialWord, Dict[] dicts) {
+        String answer = "No Jam"; // default
 
-        // k_i: i번째 시행에서 제치는 사람의 수
-        // n_i: i번째 시행에서 남은 사람의 수 (n_1 = N)
-        // 상태 전이: n_(i+1) = n_i - k_i
-        //
-        // P(i): i번쨰 시행에서 n_i명의 사람 중 k_i명을 제치고 살아남을 확률
-        // P(i) = 1 - k_i / ( n_i + 1 )           <- 문제 정의
-        //      = [ n_i + 1 - k_i ] / ( n_i + 1 ) <- 통분
-        //      = [ n_(i+1) + 1 ] / ( n_i + 1 )   <- 상태 전이 대입
-        //
-        // m번의 시행 후, 최종적으로 n_(m+1) = 0이 되며, 
-        // 이 때, 전체 확률 P는 다음과 같이 표현된다.
-        // P = P(1) * P(2) * ... * P(m)
-        //   = [ n_2 + 1 ] / ( n_1 + 1 ) * [ n_3 + 1 ] / ( n_2 + 1 ) * ... * [ n_(m+1) + 1 ] / ( n_m + 1 )
-        //   = [ n_(m+1) + 1 ] / ( n_1 + 1 ) <- 분자/분모 소거
-        //   = 1 / ( N + 1 ) <- n_(m+1) = 0 대입
-        // 
-        // 즉, k_i의 선택과 상관없이, 최종 확률은 항상 1 / ( N + 1 )로 일정함을 알 수 있다.
+        double maxEfficiency = 0;
+        for (Dict dict : dicts) {
+            if (contains(dict.word, initialWord)) {
+                var eff = efficiency(initialWord, dict.word, dict.score);
+                if (eff <= maxEfficiency) continue;
+                maxEfficiency = eff;
+                answer = dict.word;
+            }
+        }
 
-        return String.format("1\n%d", N);
+        return answer;
+    }
+
+    private boolean contains(String source, String target) {
+        int iSource = 0, iTarget = 0;
+        while (iSource < source.length() && iTarget < target.length()) {
+            if (source.charAt(iSource) == target.charAt(iTarget)) {
+                iTarget++;
+            }
+            iSource++;
+        }
+        return iTarget == target.length();
+    }
+
+    private double efficiency(String from, String to, int score) {
+        int nCharAdded = to.length() - from.length();
+        return (double) score / nCharAdded;
     }
 }
