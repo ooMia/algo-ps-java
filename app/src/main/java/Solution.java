@@ -1,61 +1,80 @@
+import java.util.SortedMap;
 
 class Solution {
-    final int BASKET_CAPACITY = 5;
-    final int[] counts;
-    int res;
 
-    Solution(int[] counts) {
-        this.counts = counts;
+    public int solution(int N, int[] A, int[] B) {
+        // A_i: i번 학생이 교환하고 싶은 수업의 번호 (from)
+        // B_i: i번 학생이 교환 받고 싶은 수업의 번호 (to)
+
+        SortedMap<Pair, Integer> map = new java.util.TreeMap<>();
+        for (int i = 0; i < N; ++i) {
+            var p = new Pair(A[i], B[i]);
+            map.put(p, map.getOrDefault(p, 0) + 1);
+        }
+
+        int count = 0;
+        while (!map.entrySet().isEmpty()) {
+            var iter = map.entrySet().iterator();
+            var e = iter.next();
+            var key = e.getKey();
+            var value = e.getValue();
+            count += value;
+            map.remove(key);
+            if (value == 0) continue;
+
+            // 후보 찾기
+            // 1. (a, b) -> (b, a)
+            Pair candidateKey = new Pair(key.to, key.from);
+            if (!map.containsKey(candidateKey)) {
+                // 2. alternative: (a, b) -> (b, c)
+                var candidates = map.tailMap(new Pair(key.to, 1));
+                if (candidates.isEmpty()) continue;
+                candidateKey = candidates.firstKey();
+            }
+
+            var candidateValue = map.get(candidateKey);
+            if (key.to != candidateKey.from) continue;
+
+            // swap
+            int nPossible = Math.min(value, candidateValue);
+            count -= nPossible;
+
+            // update
+            {
+                var v1 = value - nPossible;
+                if (v1 > 1) map.put(key, v1);
+                else map.remove(key);
+
+                var v2 = candidateValue - nPossible;
+                if (v2 > 1) map.put(candidateKey, v2);
+                else map.remove(candidateKey);
+            }
+
+            if (key.from == candidateKey.to) continue;
+            var newKey = new Pair(key.from, candidateKey.to);
+            map.put(newKey, map.getOrDefault(newKey, 1) + value + candidateValue - 2 * nPossible);
+        }
+        return count;
     }
 
-    public int solution() {
-        int iLast = BASKET_CAPACITY - 1; // 가능한 최대 무게 인덱스부터 시작
-        res = counts[iLast];
-        counts[iLast] = 0;
+    class Pair implements Comparable<Pair> {
+        final int from, to;
 
-        for (int i = iLast - 1; i >= 0; --i) {
-            if (counts[i] < 1) continue;
-
-            int iWeight = i + 1;
-            {
-                // 이론상 최대 케이스
-                // 예를 들어, 용량 5 바구니에 2kg 아이템은 2개씩 담음
-                int nPerBasket = BASKET_CAPACITY / iWeight;
-                int nFullBasket = counts[i] / nPerBasket;
-                res += nFullBasket;
-                counts[i] %= nPerBasket;
-
-                // 최대 케이스 바구니의 나머지 빈 공간 채우기
-                int capacity = BASKET_CAPACITY % iWeight;
-                for (int j = capacity - 1; j >= 0 && nFullBasket > 0; --j) {
-                    if (counts[j] < 1) continue;
-                    int jWeight = j + 1;
-                    int perBasketIdealN = capacity / jWeight;
-
-                    // 현재 아이템 개수로 채울 수 있을만큼만 채움
-                    int actualN = Math.min(counts[j], perBasketIdealN * nFullBasket);
-                    counts[j] -= actualN;
-                    nFullBasket -= actualN / perBasketIdealN;
-                }
-            }
-            {
-                if (counts[i] == 0) continue;
-
-                res += 1; // 최대로 담은 이후, 잉여는 한 바구니로 처리
-                int capacity = BASKET_CAPACITY - iWeight * counts[i];
-
-                for (int j = i - 1; j >= 0 && capacity > 0; --j) {
-                    if (j < 0 || counts[j] < 1) continue;
-                    int jWeight = j + 1;
-                    int idealN = capacity / jWeight;
-
-                    // 현재 아이템 개수로 채울 수 있을만큼만 채움
-                    int actualN = Math.min(counts[j], idealN);
-                    counts[j] -= actualN;
-                    capacity -= actualN * jWeight;
-                }
-            }
+        Pair(int from, int to) {
+            this.from = from;
+            this.to = to;
         }
-        return res;
+
+        @Override
+        public int compareTo(Pair o) {
+            int cmp = Integer.compare(from, o.from);
+            if (cmp != 0) return cmp;
+            return Integer.compare(to, o.to);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("[%d,%d]", from, to);
+        }
     }
 }
