@@ -1,5 +1,8 @@
 {
-  "java.format.settings.url": "https://gist.githubusercontent.com/ooMia/1a47bdf9ef00c3466d1f506aa99f4acb/raw/e6e7a1efef1ef98b0dca538c1869957c89b982b2/woowa-style.xml",
+  "java.format.settings.url": "https://gist.githubusercontent.com/ooMia/1a47bdf9ef00c3466d1f506aa99f4acb/raw/9e2a7274831a0c4ef15c0b67685e747f981b1b86/woowa-style.xml",
   "java.project.explorer.showNonJavaResources": false,
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "[java]": {
+    "editor.detectIndentation": false
+  }
 }
