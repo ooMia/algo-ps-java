@@ -1,32 +1,18 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Map;
 
 class Runner {
     final BufferedWriter bw;
 
-    final int N, M, K;
-    final Map<String, Integer> dict;
-    final String[] keys;
+    final int N;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.bw = bw;
 
-        var reader = new Reader(br);
+        // var reader = new Reader(br);
         try {
-            var nmk = reader.readInts();
-            N = nmk[0];
-            M = nmk[1];
-            K = nmk[2];
-
-            dict = new java.util.HashMap<>();
-            for (int i = 0; i < N; ++i) {
-                var line = br.readLine().split(" ");
-                dict.put(line[0], Integer.parseInt(line[1]));
-            }
-            keys = br.lines().toArray(String[]::new);
-
+            N = Integer.parseInt(br.readLine());
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
@@ -45,7 +31,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(N, M, K, dict, keys);
+        var res = sol.solution(N);
         _write(res);
     }
 
