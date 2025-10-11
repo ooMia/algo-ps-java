@@ -5,14 +5,16 @@ import java.io.IOException;
 class Runner {
     final BufferedWriter bw;
 
-    final long N;
+    final int N;
+    final int[] heights;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.bw = bw;
 
-        // var reader = new Reader(br);
+        var reader = new Reader(br);
         try {
-            N = Long.parseLong(br.readLine());
+            N = Integer.parseInt(br.readLine());
+            heights = reader.readInts();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -32,7 +34,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(N);
+        var res = sol.solution(N, heights);
         _write(res);
     }
 

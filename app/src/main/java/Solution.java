@@ -1,36 +1,38 @@
 class Solution {
-    final String sk = "SK", cy = "CY";
-    final boolean[] isSkWin = new boolean[]{true, true, false};
+    public int solution(int N, int[] heights) {
+        // N개의 폭죽 더미가 있다
 
-    public String solution(long N) {
-        // N 최댓값이 1_000_000_000_000이라
-        // dp로는 해결하지 못함
+        // 다음 작업을 N-2번 수행한다
 
-        // N이 작았을 때의 경우를 생각해보자
-        // 돌이 1개이면 처음 시작하는 사람이 이긴다
-        // 2개면 지고, 3개면 또 이긴다
+        // 양 끝 폭죽 더미를 제외한 폭죽 더미를 하나 고른다
+        // 해당 더미의 폭죽을 모두 터뜨린다
+        // 양 옆의 더미는 높이가 1 감소한다
 
-        // 4개면 처음에 3개를 가져가든 1개를 가져가든 진다
-        // f(1), f(3)의 반전인 결과이다.
-        // 5개면 이기고, 6개면 진다.
+        // 조건에 따라 양 끝 더미는 반드시 남게 되니까
+        // 핵심은 양 끝의 더미의 균형을 맞추는 것
 
-        // 7개면 처음에 1개를 가져가면 f(6)
-        // 3개를 가져가면 f(4)가 되어 이길 수 있다.
+        // N = 3일 때, 반드시 양쪽 모두의 개수가 줄어든다는 것을 생각하면
+        // 실질적으로 균형을 맞추는 데 사용할 수 있는 기회는 N-3번
+        // 마지막은 무조건 둘 다 1씩 감소한다 
+        return foo(N - 3, heights[0], heights[N - 1]) - 1;
+    }
 
-        // 즉, div 3의 몫과 mod 3의 나머지 결과가 중요하다.
-        // mod 3의 나머지에 따라 isSkWin 결과를 참조하고,
-        // div 3의 몫이 0, 2 ... 짝수이면 isSkWin 결과를 그대로 반환하고,
-        // 홀수이면 결과를 반전시켜 반환한다.
+    private int foo(int nSub, int n1, int n2) {
+        // nSub 횟수만큼 각 수에 뺄셈 연산을 취할 수 있다.
+        // 모든 연산을 마친 후에는 두 수의 최댓값을 반환한다.
 
-        // 결과를 정리하면
-        // 1, 2, 3은 sk, cy, sk
-        // 4, 5, 6은 cy, sk, cy
-        // 이걸 mod로 표현하려면 (N - 1) % 3 해야
-        // 각각 [0, 1, 2] 인덱스에 매핑된다
+        // 1. 두 수의 대소관계를 파악한다.
+        int big = Math.max(n1, n2);
+        int small = Math.min(n1, n2);
 
-        boolean isDivEven = ((N - 1) / 3) % 2 == 0;
-        int mod3 = (int) (N % 3);
-        boolean isSk = isDivEven ? isSkWin[mod3] : !isSkWin[mod3];
-        return isSk ? sk : cy;
+        // 2. nSub 횟수 안에 두 수를 같게 만들 수 있는지 확인한다.
+        int need = big - small;
+        boolean canEqual = need <= nSub;
+
+        // 3-1. 두 수가 같아질 수 있으면,
+        // 두 수를 같게 만든 이후에 남은 nSub를 둘로 나누어 균등하게 뺄셈
+        // 작은 수 - (nSub - need) / 2 반환
+        // 3-2. 두 수가 같아질 수 없으면, 큰 수 - nSub 반환
+        return canEqual ? small - (nSub - need) / 2 : big - nSub;
     }
 }
