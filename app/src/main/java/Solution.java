@@ -1,13 +1,12 @@
 class Solution {
 
-    public int solution(int N, String name) {
-        int res = 0;
-        for (char c : name.toCharArray())
-            res += score(c);
-        return res;
-    }
+    public String solution(char c, String line) {
+        char upper = Character.toUpperCase(c);
+        char lower = Character.toLowerCase(c);
 
-    int score(char c) {
-        return c - 'A' + 1;
+        int count = 0;
+        for (char target : line.toCharArray())
+            if (target == upper || target == lower) ++count;
+        return String.format("%c %d\n", c, count);
     }
 }

@@ -1,5 +1,5 @@
-2
-7
-SUNGPIL
-6
-SOYOON
+1
+g Programming Contest
+n New Zealand
+x This is quite a simple problem.
+#
