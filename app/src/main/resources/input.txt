@@ -1,5 +1,11 @@
 1
-g Programming Contest
-n New Zealand
-x This is quite a simple problem.
-#
+0 32
+3 13
+28 25
+17 5
+21 20
+11 0
+12 12
+4 2
+0 8
+21 0

@@ -3,23 +3,24 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 class Runner {
-    final BufferedReader br;
     final BufferedWriter bw;
 
+    final int[][] records;
+
     Runner(BufferedReader br, BufferedWriter bw) {
-        this.br = br;
         this.bw = bw;
 
-        // var reader = new Reader(br);
-        // try {
-        //     N = Integer.parseInt(br.readLine());
-        //     name = br.readLine();
-
-        // } catch (IOException e) {
-        //     throw new RuntimeException(e);
-        // } catch (Exception e) {
-        //     throw new RuntimeException(e);
-        // }
+        var reader = new Reader(br);
+        try {
+            records = new int[10][];
+            for (int i = 0; i < records.length; ++i) {
+                records[i] = reader.readInts();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void flush() {
@@ -33,13 +34,8 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        while (true) {
-            var line = br.readLine();
-            char c = line.charAt(0);
-            if ('#' == c) break;
-            var res = sol.solution(c, line.substring(2));
-            _write(res);
-        }
+        var res = sol.solution(records);
+        _write(res);
     }
 
     private void _write(Object o) {

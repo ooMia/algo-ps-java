@@ -1,12 +1,12 @@
 class Solution {
-
-    public String solution(char c, String line) {
-        char upper = Character.toUpperCase(c);
-        char lower = Character.toLowerCase(c);
-
-        int count = 0;
-        for (char target : line.toCharArray())
-            if (target == upper || target == lower) ++count;
-        return String.format("%c %d\n", c, count);
+    public int solution(int[][] records) {
+        int maxCount = -1;
+        int cur = 0;
+        for (int[] record : records) {
+            cur += record[1];
+            cur -= record[0];
+            maxCount = Math.max(maxCount, cur);
+        }
+        return maxCount;
     }
 }
