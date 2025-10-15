@@ -52,19 +52,23 @@ class Solution {
 
             // 중간 노드의 연결성을 확인한다.
             // 인덱스 구간은 [idStart + 1, maxId - 1] 
-            for (int idMiddle = idStart + 1; idMiddle <= maxId - 1; ++idMiddle) {
-                if (startNode.nextRelationId(idMiddle) < 0) continue;
+            for (int idMiddle = startNode.nextRelationId(idStart + 1);
+                 idMiddle > 0;
+                 idMiddle = startNode.nextRelationId(idMiddle + 1)
+            ) {
                 var middleNode = nodes[idMiddle];
 
                 // 마지막 노드도 동일한 방식으로 탐색
                 // [idMiddle + 1, maxId]
-                for (int idLast = idMiddle + 1; idLast <= maxId; ++idLast) {
-                    if (middleNode.nextRelationId(idLast) < 0) continue;
+                for (int idLast = middleNode.nextRelationId(idMiddle + 1);
+                     idLast > 0;
+                     idLast = middleNode.nextRelationId(idLast + 1)
+                ) {
                     var lastNode = nodes[idLast];
 
-                    // 만약 초기 노드와 연결되어 있다면
                     if (!lastNode.isConnectedTo(idStart)) continue;
 
+                    // 만약 초기 노드와 연결되어 있다면
                     // 세 노드의 cardinality에 대한 계산식을 수행하고
                     // Math.min으로 갱신
                     min = Math.min(min, calcFriendsNumber(startNode, middleNode, lastNode));
