@@ -5,19 +5,21 @@ import java.io.IOException;
 class Runner {
     final BufferedWriter bw;
 
-    final String[] inputs;
+    final int N;
+    final long[] numbers;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.bw = bw;
 
-        // var reader = new Reader(br);
-        inputs = br.lines().toArray(String[]::new);
-        // try {
-        // } catch (IOException e) {
-        //     throw new RuntimeException(e);
-        // } catch (Exception e) {
-        //     throw new RuntimeException(e);
-        // }
+        var reader = new Reader(br);
+        try {
+            N = Integer.parseInt(br.readLine());
+            numbers = reader.readLongs();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void flush() {
@@ -30,8 +32,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(inputs);
-        var res = sol.solution();
+        var sol = new Solution();
+        var res = sol.solution(N, numbers);
         _write(res);
     }
 
