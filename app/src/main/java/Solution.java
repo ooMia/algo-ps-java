@@ -1,112 +1,113 @@
-import java.util.BitSet;
+import java.util.ArrayList;
+import java.util.List;
 
 class Solution {
-    final int maxId;
-    final Node[] nodes;
 
-    public Solution(int maxId, int[][] relations) {
-        this.maxId = maxId;
-        this.nodes = new Node[maxId + 1];
-        for (int i = 1; i <= maxId; ++i) {
-            nodes[i] = new Node(i);
-        }
-        initNodes(relations); // 주어진 관계 정보에 따라 노드 초기화
+    private static final int ID_START = 1, ID_END = 0;
+    private final String[] inputs;
+    private int iInput = 0;
+
+    public Solution(String[] inputs) {
+        this.inputs = inputs;
     }
 
-    private void initNodes(int[][] relations) {
-        for (int[] relation : relations) {
-            int id_0 = relation[0], id_1 = relation[1];
-            nodes[id_0].addRelation(id_1);
-            nodes[id_1].addRelation(id_0);
-        }
-    }
+    public String solution() {
+        var node = Node.nodes[ID_START];
 
-    public int solution() {
-        int min = Integer.MAX_VALUE;
-        // 첫 번쨰 케이스는 대략 이런 느낌이다.
-        // 1   1
-        // 2 - 3
-        // 4   4 - 5
+        // 조건을 보면 10번의 차례까지만 윷을 던질 수 있다.
+        for (int turn = 0; turn < 10; ++turn) {
 
-        // 셋이 모두 친구라는 것은 그래프에 순환이 존재한다는 뜻이다
-        // 순환을 체크할 때 방문 배열을 활용한다
+            // 문제의 조건을 보면, 윷은 굴리는 순간마다 말을 매번 전진시켜야 한다.
+            // while (true) {
+            //     var iDice = playables.indexOf(node.distanceToShortcut());
+            //     if (iDice == -1) break;
+            //     var dice = playables.remove(iDice);
+            //     node = node.moveToNextNode(dice);
+            // }
 
-        // 시작 노드를 A로 고정했을 때,
-        // A와 연결된 노드와 그 노드로부터 한 노드를 거쳐
-        // 다시 A로 돌아올 수 있다면
-        // 그 조합에 대해 친구 수를 계산할 가치가 있다.
-
-        // 만약 어떤 세 노드가 서로 순환되는 관계라고 가정했을 때,
-        // (각 노드에서 나가는 연결의 수의 합) - 2 * 3
-        // 으로 친구의 수를 구할 수 있다.
-
-        // 조합에 대한 탐색을 시도해보았는지 임시로 기록하는 배열 대신
-        // 만약 내가 현재 2번 노드를 시작 노드로 삼아 순회하고 있다면
-        // 자신보다 id가 작은 노드들, 가령 1번 노드로 시작하는 경우는
-        // 이미 고려했다고 판단하고 순회에서 제외한다.
-        // 이 규칙에 따르면 가능한 시작노드는 1부터 maxId - 2까지 가능하다.
-
-        for (int idStart = 1; idStart <= maxId - 2; ++idStart) {
-            // 초기 노드를 방문한다.
-            var startNode = nodes[idStart];
-
-            // 중간 노드의 연결성을 확인한다.
-            // 인덱스 구간은 [idStart + 1, maxId - 1] 
-            for (int idMiddle = startNode.nextRelationId(idStart + 1);
-                 idMiddle > 0;
-                 idMiddle = startNode.nextRelationId(idMiddle + 1)
-            ) {
-                var middleNode = nodes[idMiddle];
-
-                // 마지막 노드도 동일한 방식으로 탐색
-                // [idMiddle + 1, maxId]
-                for (int idLast = middleNode.nextRelationId(idMiddle + 1);
-                     idLast > 0;
-                     idLast = middleNode.nextRelationId(idLast + 1)
-                ) {
-                    var lastNode = nodes[idLast];
-
-                    if (!lastNode.isConnectedTo(idStart)) continue;
-
-                    // 만약 초기 노드와 연결되어 있다면
-                    // 세 노드의 cardinality에 대한 계산식을 수행하고
-                    // Math.min으로 갱신
-                    min = Math.min(min, calcFriendsNumber(startNode, middleNode, lastNode));
-                }
-
+            for (var dice : roll()) {
+                node = node.moveToNextNode(dice);
             }
-
+            // System.err.println(node.id + " " + node.pos);
         }
-        if (min == Integer.MAX_VALUE) return -1;
-        return min;
+        if (node.id == ID_END && node.pos > 0) return "WIN";
+        return "LOSE";
     }
 
-    private int calcFriendsNumber(Solution.Node startNode, Solution.Node middleNode, Solution.Node lastNode) {
-        return startNode.nTotalRelations() + middleNode.nTotalRelations() + lastNode.nTotalRelations() - 2 * 3;
+    private List<Integer> roll() {
+        var playables = new ArrayList<Integer>();
+        while (iInput < inputs.length) {
+            var dice = toDistance(inputs[iInput++]);
+            playables.add(dice);
+            if (dice < 4) break;
+        }
+        return playables;
     }
 
-    class Node {
-        final int id;
-        final BitSet relation = new BitSet(maxId + 1);
+    private int toDistance(String input) {
+        if ("1111".equals(input)) return 5;
+        return (int) input.chars().filter(c -> c == '0').count();
+    }
 
-        public Node(int id) {
+    static class Node {
+        // 3   2
+        //   5  
+        // 4   1(0)
+
+        static final int ID_NOT_EXIST = -1;
+        static final int[][] dist = new int[5 + 1][5 + 1];
+        static final Node[] nodes = new Node[5 + 1];
+
+        static {
+            dist[0][0] = Integer.MAX_VALUE;
+            dist[1][2] = dist[2][3] = dist[3][4] = dist[4][0] = 5;
+            dist[2][5] = dist[3][5] = dist[5][4] = dist[5][0] = 3;
+
+            // 1->2->3->4->0->0
+            // 2->5, 3->5, 5->4, 5->0
+            nodes[0] = new Node(0, 0, ID_NOT_EXIST);
+            nodes[1] = new Node(1, 2, ID_NOT_EXIST);
+            nodes[2] = new Node(2, 3, 5);
+            nodes[3] = new Node(3, 4, 5);
+            nodes[4] = new Node(4, 0, ID_NOT_EXIST);
+            nodes[5] = new Node(5, 0, ID_NOT_EXIST);
+        }
+
+        // 각각의 노드는 다음 경로로의 정보를 담아야 한다.
+        private int pos = 0, id, normalId, shortcutId;
+
+        Node(int id, int normalId, int shortcutId) {
             this.id = id;
+            this.normalId = normalId;
+            this.shortcutId = shortcutId;
         }
 
-        void addRelation(int id) {
-            relation.set(id);
+        Node moveToNextNode(int distance) {
+            this.pos += distance;
+            var nextId = nextNodeId();
+            int length = dist[id][nextId];
+            if (pos < length) return this;
+
+            var nextNode = nodes[nextId];
+            nextNode.pos = pos - length;
+            System.err.println(nextNode.id + " " + nextNode.pos);
+            return nextNode.moveToNextNode(0);
         }
 
-        int nTotalRelations() {
-            return relation.cardinality();
+        int distanceToShortcut() {
+            return dist[id][getShortcutId()] - pos;
         }
 
-        int nextRelationId(int fromIndex) {
-            return relation.nextSetBit(fromIndex);
+        private int nextNodeId() {
+            return canUseShortcut() ? getShortcutId() : normalId;
         }
 
-        boolean isConnectedTo(int id) {
-            return relation.get(id);
+        private boolean canUseShortcut() {
+            return distanceToShortcut() == 0;
+        }
+
+        private int getShortcutId() {
+            return shortcutId != ID_NOT_EXIST ? shortcutId : normalId;
         }
     }
 }

@@ -5,26 +5,19 @@ import java.io.IOException;
 class Runner {
     final BufferedWriter bw;
 
-    final int N;
-    final int[][] relations;
+    final String[] inputs;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.bw = bw;
 
-        var reader = new Reader(br);
-        try {
-            var line = reader.readInts();
-            N = line[0];
-            var m = line[1];
-            relations = new int[m][];
-            for (int i = 0; i < relations.length; ++i) {
-                relations[i] = reader.readInts();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // var reader = new Reader(br);
+        inputs = br.lines().toArray(String[]::new);
+        // try {
+        // } catch (IOException e) {
+        //     throw new RuntimeException(e);
+        // } catch (Exception e) {
+        //     throw new RuntimeException(e);
+        // }
     }
 
     public void flush() {
@@ -37,8 +30,8 @@ class Runner {
     }
 
     public void run() throws IOException {
-        var sol = new Solution(N,relations);
-        var res = sol.solution( );
+        var sol = new Solution(inputs);
+        var res = sol.solution();
         _write(res);
     }
 
