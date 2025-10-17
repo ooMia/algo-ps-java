@@ -1,22 +1,110 @@
+import java.util.TreeSet;
+
 class Solution {
 
-    // 수열 A가 주어지면, 다음과 같이 수열 B를 만든다.
-    // (누적 평균) = (누적 합) / 개수
+    public String solution(String[] dices) {
+        var node = Node.getStartNode();
+        int turn = 1;
+        int iDice = 0;
 
-    // 따라서, B가 주어지면 A에 대한 누적 합 배열을 구할 수 있다.
-    // 각 요소 * (현재 인덱스 + 1) = (현재까지의 A의 누적 합)
+        while (turn <= 10 && iDice < dices.length) {
+            int dice = toDice(dices[iDice++]);
+            node = node.move(dice);
 
-    // 각 누적합 배열의 요소는 이전 요소와의 차이를 통해
-    // 원래 수열 A의 요소를 구할 수 있다.
+            System.err.printf("Turn %d: Dice %d -> Node %d%n", turn, dice, node.id);
+            if (node.isDestination()) return "WIN";
 
-    public String solution(int N, long[] numbers) {
-        for (int i = numbers.length - 1; i > 0; --i) {
-            numbers[i] = numbers[i] * (i + 1) - numbers[i - 1] * i;
+            // 윷(4)이나 모(5)가 아닌 경우에만 턴 증가
+            if (dice < 4) turn++;
         }
-        StringBuilder sb = new StringBuilder();
-        for (long num : numbers) {
-            sb.append(num).append(' ');
+        return "LOSE";
+    }
+
+    int toDice(String s) {
+        if ("1111".equals(s)) return 5;
+        return (int) s.chars().filter(c -> c == '0').count();
+    }
+
+    static class Node {
+
+        // 20 14 13     12 11 10
+        // 21 25           15  4
+        // 22    26     16     3
+        //         40 30
+        // 23    31     41     2
+        // 24 32           42  1  0
+        // 50 51 52     53 54 55 56
+
+        // 보드를 이런 식으로 설계한다고 했을 때,
+        // 0. 0은 시작점이고, 46은 도착점이다.
+        // 1. 일의 자리 수가 0이면 꼭지점을 의미
+        // 2. 각 꼭지점에 대해 경로의 분기가 발생한다.
+        // 3. 현재 주어진 dice를 모두 소모했을 때, 정확히 꼭지점에 위치하는 경우
+        //    선택 가능한 경로 중 가장 id가 높은 쪽으로 진행한다.
+        // 4. 그 외에는 항상 id가 낮은 쪽으로 진행한다.
+
+        private static final Node[] nodes = new Node[57];
+        static {
+            for (int id = 0; id <= 56; ++id) {
+                nodes[id] = new Node(id);
+            }
+
+            nodes[0].connect(1).connect(2).connect(3).connect(4).connect(10);
+            nodes[10].connect(11).connect(12).connect(13).connect(14).connect(20);
+            nodes[20].connect(21).connect(22).connect(23).connect(24).connect(50);
+            nodes[50].connect(51).connect(52).connect(53).connect(54).connect(55).connect(56);
+
+            nodes[10].connect(15).connect(16).connect(30).connect(31).connect(32).connect(50);
+            nodes[20].connect(25).connect(26).connect(40).connect(41).connect(42);
+            nodes[30].connect(41).connect(42).connect(55);
+
+            nodes[46].connect(46);
         }
-        return sb.toString();
+
+        static Node getStartNode() {
+            return nodes[0];
+        }
+
+        final int id;
+        private final TreeSet<Node> edges = new TreeSet<>(
+            (a, b) -> Integer.compare(a.id, b.id)
+        ); // 오름차순 정렬
+
+        public Node(int id) {
+            this.id = id;
+        }
+
+        /**
+         * @param id 연결할 노드의 id
+         * @return id번 노드 객체
+         */
+        private Node connect(int id) {
+            var node = nodes[id];
+            edges.add(node);
+            return node;
+        }
+
+        boolean isCorner() {
+            return id % 10 == 0;
+        }
+
+        boolean isDestination() {
+            return id == 56;
+        }
+
+        private Node _move(int dice) {
+            if (dice == 0 || edges.isEmpty()) return this;
+            return edges.first()._move(dice - 1);
+        }
+
+        public Node move(int dice) {
+            // 가장 id가 높은 쪽으로 이동한 이후
+            // 나머지는 일반적인 이동
+            if (isCorner()) {
+                return edges.last()._move(dice - 1);
+            }
+            return _move(dice);
+        }
+
     }
 }
