@@ -14,7 +14,8 @@ class Reader {
     }
 
     public int[] readInts() throws IOException {
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        String line = br.readLine();
+        StringTokenizer st = new StringTokenizer(line, " ");
         int cnt = st.countTokens();
         int[] ints = new int[cnt];
         for (int i = 0; i < cnt; ++i) {

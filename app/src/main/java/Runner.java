@@ -5,21 +5,28 @@ import java.io.IOException;
 class Runner {
     final BufferedWriter bw;
 
-    final int N;
-    final int M;
-    final int[][] paths;
+    final int nInputs;
+    final int destId;
+    final Solution.Graph graph;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.bw = bw;
         var reader = new Reader(br);
         try {
             int[] line = reader.readInts();
-            N = line[0];
-            M = line[1];
-            paths = new int[N][];
-            for (int i = 0; i < N; i++) {
-                paths[i] = reader.readInts();
+            this.destId = line[0];
+            this.nInputs = line[1];
+
+            if (nInputs > 0) {
+                int[][] paths = new int[nInputs][];
+                for (int i = 0; i < nInputs; ++i) {
+                    paths[i] = reader.readInts();
+                }
+                graph = new Solution.Graph(destId, paths);
+            } else {
+                graph = null;
             }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
@@ -38,7 +45,11 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(N, M, paths);
+        if (nInputs == 0) {
+            _write(-1);
+            return;
+        }
+        var res = sol.solution(destId, graph);
         _write(res);
     }
 
