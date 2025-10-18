@@ -45,10 +45,6 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        if (nInputs == 0) {
-            _write(-1);
-            return;
-        }
         var res = sol.solution(destId, graph);
         _write(res);
     }
