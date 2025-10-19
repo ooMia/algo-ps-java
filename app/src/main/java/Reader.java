@@ -23,4 +23,15 @@ class Reader {
         }
         return ints;
     }
+
+    public long[] readLongs() throws IOException {
+        String line = br.readLine();
+        StringTokenizer st = new StringTokenizer(line, " ");
+        int cnt = st.countTokens();
+        long[] longs = new long[cnt];
+        for (int i = 0; i < cnt; ++i) {
+            longs[i] = Long.parseLong(st.nextToken());
+        }
+        return longs;
+    }
 }
