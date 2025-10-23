@@ -5,22 +5,13 @@ import java.io.IOException;
 class Runner {
     final BufferedWriter bw;
 
-    final int nRows, nCols;
-    final int[][] positions;
+    final int n;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.bw = bw;
-        var reader = new Reader(br);
+        // var reader = new Reader(br);
         try {
-            var line = reader.readInts();
-            nRows = line[0];
-            nCols = line[1] + 2;
-
-            var nClasses = line[2];
-            positions = new int[nClasses][];
-            for (int i = 0; i < nClasses; ++i) {
-                positions[i] = reader.readInts();
-            }
+            this.n = Integer.parseInt(br.readLine());
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -40,7 +31,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(nRows, nCols, positions);
+        var res = sol.solution(n);
         _write(res);
     }
 
