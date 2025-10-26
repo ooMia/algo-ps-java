@@ -1,5 +1,9 @@
 class Solution {
-    public int solution(int a, int b) {
-        return b - a;
+    public String solution(int[][] pairs) {
+        var sb = new StringBuilder();
+        for (var pair : pairs) {
+            sb.append(pair[1] / (pair[0] + 1)).append('\n');
+        }
+        return sb.toString().trim();
     }
 }
