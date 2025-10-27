@@ -5,16 +5,14 @@ import java.io.IOException;
 class Runner {
     final BufferedWriter bw;
 
-    final int[][] pairs;
+    final String[] lines;
 
     Runner(BufferedReader br, BufferedWriter bw) {
         this.bw = bw;
         // var reader = new Reader(br);
         try {
-            this.pairs = br.lines().map(line -> {
-                var nums = line.split(" ");
-                return new int[]{Integer.parseInt(nums[0]), Integer.parseInt(nums[1])};
-            }).toArray(int[][]::new);
+            this.lines = br.lines().toArray(String[]::new);
+
         // } catch (IOException e) {
         //     throw new RuntimeException(e);
         } catch (Exception e) {
@@ -33,7 +31,7 @@ class Runner {
 
     public void run() throws IOException {
         var sol = new Solution();
-        var res = sol.solution(pairs);
+        var res = sol.solution(lines);
         _write(res);
     }
 
